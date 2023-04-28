@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ServerObjectTest extends JFrame implements Runnable {
@@ -49,7 +50,7 @@ public class ServerObjectTest extends JFrame implements Runnable {
 		        ObjectOutputStream outputToClient = new ObjectOutputStream(socket.getOutputStream());
 	          
 		        while(true) {
-			        
+		        	String returnMessage = null;
 		        	//inputFromClient = new ObjectInputStream(socket.getInputStream());
 
         	        Object object = null;
@@ -72,8 +73,19 @@ public class ServerObjectTest extends JFrame implements Runnable {
 
 			        ta.append("\n");
 			        
+			        String statusString = checkGame(g);
+			        if(statusString.equals("No such game exists")) {
+			        	saveGame(g);
+			        	returnMessage = "Saved to database!";
+			        	outputToClient.writeObject(returnMessage);
+			        }
+			        else {
+			        	returnMessage = "You already have a game saved! Please load your existing game and finish playing it, or delete it!";
+			        	outputToClient.writeObject(returnMessage);
+			        	outputToClient.flush();
+			        	
+			        }
 			        
-			        saveGame(g);
 			        
 			        
 			      /*  
@@ -145,6 +157,33 @@ public class ServerObjectTest extends JFrame implements Runnable {
             System.out.println(ex.getMessage());
         } 
 	}
+	
+	public static String checkGame(testGame game) {
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		ResultSet rs = null;
+		String inputUsername = game.getUsername();
+		String inputPassword = game.getPassword();
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
+			String queryString = "SELECT * FROM objectstore WHERE username = ? and password = ?";
+			preparedStatement = connection.prepareStatement(queryString);
+			preparedStatement.setString(1, inputUsername);
+			preparedStatement.setString(2, inputPassword);
+			rs = preparedStatement.executeQuery();
+			if(!rs.isBeforeFirst() && rs.getRow() == 0) {
+				return "No such game exists";
+			}
+			preparedStatement.close();
+			connection.close();
+			rs.close();
+			
+		}catch (SQLException ex) {
+		    ex.printStackTrace();
+		}
+		return "Game exists";
+	}
+
 	
 	public static void main(String[] args) {
 		ServerObjectTest s=  new ServerObjectTest();

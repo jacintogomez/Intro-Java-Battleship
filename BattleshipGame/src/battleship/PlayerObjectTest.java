@@ -112,7 +112,14 @@ public class PlayerObjectTest extends JFrame {
 			        testGame game1 = new testGame(userInputName, "genericpassword"); 
 			        textArea.append("About to write!\n");
 			        toServer.writeObject(game1);
+			        toServer.flush();
 			        //toServer.flush();
+			        
+			        Object object = null;
+					
+					object = fromServer.readObject();
+					String messageForPlayer = (String)object;
+			        textArea.append(messageForPlayer + "\n");
 	
 			        
 			      }
@@ -128,7 +135,10 @@ public class PlayerObjectTest extends JFrame {
 			    	  System.err.println(nfe);
 			    	  textArea.append("Bad format!\n");
 	
-			      }
+			      } catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		}
 

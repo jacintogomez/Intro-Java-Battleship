@@ -140,8 +140,9 @@ public class ServerTest extends JFrame implements Runnable {
 			rs.next();
 			
 			retString = rs.getString(1);
-			
-			
+			preparedStatement.close();
+			connection.close();
+			rs.close();	
 			
 		}catch (SQLException ex) {
 		    ex.printStackTrace();
