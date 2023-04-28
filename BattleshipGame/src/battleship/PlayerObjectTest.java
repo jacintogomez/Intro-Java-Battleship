@@ -82,6 +82,14 @@ public class PlayerObjectTest extends JFrame {
 			// TODO Auto-generated method stub
 			try {
 				socket = new Socket("localhost", 8000);
+				try {
+			    	  toServer = new ObjectOutputStream(socket.getOutputStream()); //if put ObjectInputStream first, doesn't work. WHY???
+				      fromServer = new ObjectInputStream(socket.getInputStream());
+					      
+				    }
+				    catch (IOException ex) {
+				      textArea.append(ex.toString() + '\n');
+				    }
 				textArea.append("connected\n");
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -98,14 +106,7 @@ public class PlayerObjectTest extends JFrame {
 		public void keyPressed(KeyEvent e) {
 			if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 				textArea.append("Test!\n");
-			    try {
-			    	  toServer = new ObjectOutputStream(socket.getOutputStream()); //if put ObjectInputStream first, doesn't work. WHY???
-				      fromServer = new ObjectInputStream(socket.getInputStream());
-					      
-				    }
-				    catch (IOException ex) {
-				      textArea.append(ex.toString() + '\n');
-				    }
+			    
 			    
 			    try {
 			    	String userInputName = textField.getText().trim();
