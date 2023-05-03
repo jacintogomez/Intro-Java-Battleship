@@ -46,7 +46,30 @@ public class PlayerButtonUI implements ActionListener {
 		
 	}
 	
-	private void createUI()
+	private void connectionUI() {
+		JFrame frame = new JFrame("Connection Panel");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		ta = new JTextArea(30,30);
+		frame.setLayout(new BorderLayout());
+	
+		JPanel topPanel = new JPanel(new GridLayout(2,1));
+		JPanel controlPanel = new JPanel();
+		openButton = new JButton("Open Connection");
+		closeButton = new JButton("Close Connection");
+		closeButton.addActionListener(this);
+		openButton.addActionListener(this);
+		controlPanel.add(openButton);
+		controlPanel.add(closeButton);
+		topPanel.add(controlPanel);
+		frame.add(topPanel, BorderLayout.NORTH);
+	
+		frame.add(ta, BorderLayout.CENTER);
+		
+		frame.setSize(400, 200);
+		frame.setVisible(true);
+	}
+	
+	private void userTypeUI()
 	{
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,60 +95,6 @@ public class PlayerButtonUI implements ActionListener {
 		frame.add(pnlLabel, BorderLayout.NORTH);
 		frame.add(pnlButton, BorderLayout.CENTER);
 		
-		//frame.pack();
-		frame.setVisible(true);
-	}
-	
-	private void newOrLoadGame()
-	{
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400,100);
-		//Layout of Main Window
-		frame.setLayout(new BorderLayout());
-		
-		newLoadGameLabel = new JLabel("Start a New Game or Load an Existing Game");
-		JPanel pnlLabel = new JPanel();
-		pnlLabel.add(newLoadGameLabel);
-		btnNewGame = new JButton("Start New Game");
-		btnNewGame.addActionListener(this);
-		
-		btnLoadGame = new JButton("Load Existing Game");
-		btnLoadGame.addActionListener(this);
-		
-		JPanel pnlButton = new JPanel(new GridLayout(1,2));
-		
-		pnlButton.add(btnNewGame);
-		pnlButton.add(btnLoadGame);
-		
-		
-		frame.add(pnlLabel, BorderLayout.NORTH);
-		frame.add(pnlButton, BorderLayout.CENTER);
-		
-		//frame.pack();
-		frame.setVisible(true);
-	}
-	
-	private void connectionUI() {
-		JFrame frame = new JFrame("Connection Panel");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		ta = new JTextArea(30,30);
-		frame.setLayout(new BorderLayout());
-	
-		JPanel topPanel = new JPanel(new GridLayout(2,1));
-		JPanel controlPanel = new JPanel();
-		openButton = new JButton("Open Connection");
-		closeButton = new JButton("Close Connection");
-		closeButton.addActionListener(this);
-		openButton.addActionListener(this);
-		controlPanel.add(openButton);
-		controlPanel.add(closeButton);
-		topPanel.add(controlPanel);
-		frame.add(topPanel, BorderLayout.NORTH);
-	
-		frame.add(ta, BorderLayout.CENTER);
-		
-		frame.setSize(400, 200);
 		frame.setVisible(true);
 	}
 	
@@ -160,6 +129,38 @@ public class PlayerButtonUI implements ActionListener {
 		frame.setVisible(true);
 	}
 	
+	private void newOrLoadGameUI()
+	{
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(400,100);
+		//Layout of Main Window
+		frame.setLayout(new BorderLayout());
+		
+		newLoadGameLabel = new JLabel("Start a New Game or Load an Existing Game");
+		JPanel pnlLabel = new JPanel();
+		pnlLabel.add(newLoadGameLabel);
+		btnNewGame = new JButton("Start New Game");
+		btnNewGame.addActionListener(this);
+		
+		btnLoadGame = new JButton("Load Existing Game");
+		btnLoadGame.addActionListener(this);
+		
+		JPanel pnlButton = new JPanel(new GridLayout(1,2));
+		
+		pnlButton.add(btnNewGame);
+		pnlButton.add(btnLoadGame);
+		
+		
+		frame.add(pnlLabel, BorderLayout.NORTH);
+		frame.add(pnlButton, BorderLayout.CENTER);
+		
+		//frame.pack();
+		frame.setVisible(true);
+	}
+	
+	
+	
 	@Override
 	public void actionPerformed(ActionEvent evt) {		
 		String cmd = evt.getActionCommand();
@@ -187,9 +188,8 @@ public class PlayerButtonUI implements ActionListener {
 				      ta.append(ex.toString() + '\n');
 				    }
 				ta.append("connected\n");
-				createUI();
+				userTypeUI();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				ta.append("connection Failure\n");
 			}
@@ -254,7 +254,7 @@ public class PlayerButtonUI implements ActionListener {
 	        if(messageForPlayer.equals("Welcome back!") || messageForPlayer.equals("Username and password saved!")) {
 	        	this.username = username;
 	        	this.password = password;
-	        	newOrLoadGame();
+	        	newOrLoadGameUI();
 	        }
 		} catch (IOException e) {
 			e.printStackTrace();

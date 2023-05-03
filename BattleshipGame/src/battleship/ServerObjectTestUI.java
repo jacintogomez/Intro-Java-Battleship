@@ -92,7 +92,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 					        	outputToClient.writeObject(game1);
 					        }
 					        else {
-					        	returnMessage = "You do not have a game saved. Please start a new game!";
+					        	returnMessage = "You do not have a game saved.\nPlease start a new game!";
 					        	outputToClient.writeObject(returnMessage);
 					        	outputToClient.flush();
 					        }
@@ -121,7 +121,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 						        userNamePword = true;
 							}
 							else {
-								returnMessage = "This username has already been chosen! Please choose another username!";
+								returnMessage = "This username has already been chosen!\nPlease choose another username!";
 						        outputToClient.writeObject(returnMessage);
 						        outputToClient.flush();
 								
@@ -130,7 +130,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 						else if(isNew.equals("existing")) {
 							String statusPassword = checkUsernamePassword(username, password);
 							if(statusPassword.equals("No Username")) {
-								returnMessage = "This username/password combination does not exist! Please enter your existing username/password or register as a new user!";
+								returnMessage = "This username/password combination does not exist!\nPlease enter your existing username/password or register as a new user!";
 						        outputToClient.writeObject(returnMessage);
 						        outputToClient.flush();
 							}
@@ -142,27 +142,6 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 							}
 						}
 					}
-        	        
-					/*
-        	        testGame g = (testGame)object;
-        	        String temp = g.toString();
-        	        ta.append("Game: " + temp);
-
-			        ta.append("\n");
-			        
-			        String statusString = checkGame(g);
-			        if(statusString.equals("No such game exists")) {
-			        	saveGame(g);
-			        	returnMessage = "Saved to database!";
-			        	outputToClient.writeObject(returnMessage);
-			        }
-			        else {
-			        	returnMessage = "You already have a game saved! Please load your existing game and finish playing it, or delete it!";
-			        	outputToClient.writeObject(returnMessage);
-			        	outputToClient.flush();
-			        	
-			        }
-			        */
 			        
 		        }
 		        
