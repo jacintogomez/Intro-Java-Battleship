@@ -23,7 +23,7 @@ import javax.swing.JTextField;
 
 public class Player implements ActionListener{
 	String username;
-	String password;
+	private String password;
 	private boolean isNew;
 	private boolean loadedGame = false;
 	private static int nextId = 0;
@@ -57,6 +57,14 @@ public class Player implements ActionListener{
 		this.password=password;
 		this.Id=id;
 		this.numberofwins=numberofwins;
+	}
+	
+	public String getUsername() {
+		return this.username;
+	}
+	
+	public String getPassword() {
+		return this.password;
 	}
 	
 	private void connectionUI() {
@@ -225,7 +233,10 @@ public class Player implements ActionListener{
 			}
 		}
 		else if(cmd.equals("Start New Game")) {
-			System.out.print("Board class goes here!");
+			Board newGame = new Board(this.username, this.password);
+			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		    newGame.setVisible(true);    
+		    newGame.setResizable(true);
 		}
 		else if(cmd.equals("Load Existing Game")) {
 			loadGame();

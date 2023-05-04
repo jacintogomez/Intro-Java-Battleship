@@ -17,7 +17,7 @@ import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
-public class Board extends JFrame implements Runnable{
+public class BoardOG extends JFrame implements Runnable{
 	private static final Color[] TILE_COLORS = {
 	    Color.BLUE,   // open
 	    Color.GRAY,   // ship
@@ -52,22 +52,12 @@ public class Board extends JFrame implements Runnable{
 	private ArrayList<Ship> opships=new ArrayList<Ship>();
 	private ImagePanel leftboard;
 	private ImagePanel rightboard;
-	private String playerUsername;
-	private String playerPassword;
+	private Player player;
 	private int ophitsleft;
 	private int myhitsleft;
-	/*
-	public Board() {
-		//player=new Player("Jacinto","jg6243",777);
-		
-		
-	}
-	*/
-	public Board(String username, String password) {
-		//this();
-		this.playerUsername = username;
-		this.playerPassword = password;
-		
+	
+	public BoardOG() {
+		player=new Player("Jacinto","jg6243",777);
 		for(int x=0;x<10;x++) {
 			for(int y=0;y<10;y++) {
 				mygrid[x][y]=1;
@@ -88,7 +78,6 @@ public class Board extends JFrame implements Runnable{
 	    createpanel();
 	    Thread t=new Thread(this);
 	    t.start();
-
 	}
 	
 	public void run() {
@@ -152,7 +141,7 @@ public class Board extends JFrame implements Runnable{
 	            }
 	            FontMetrics fm = g.getFontMetrics();
 	            g.setFont(new Font("Arial", Font.BOLD, 24));
-	            g.drawString(playerUsername,xoffset + (gridwidth - fm.stringWidth(playerUsername)) / 2,yoffset-50);
+	            g.drawString(player.username,xoffset + (gridwidth - fm.stringWidth(player.username)) / 2,yoffset-50);
 	        }
 	    };
 		leftboard=new ImagePanel(){
@@ -239,13 +228,13 @@ public class Board extends JFrame implements Runnable{
 				System.out.println("checking");
 				if(s.active==true&&(s.holes==s.struck)) {
 					s.active=false;
-					aftermessage=playerUsername+" sunk the computer's "+s.name+'\n';
+					aftermessage=player.username+" sunk the computer's "+s.name+'\n';
 				}
 			}
 			checkifgameover();
 		} //I hit a ship
 		//calerts.setText(player.username+" guesses "+choice+" - "+hitormiss);
-		messages.insert(playerUsername+" guesses "+choice+" - "+hitormiss+'\n',0);
+		messages.insert(player.username+" guesses "+choice+" - "+hitormiss+'\n',0);
 		timedelay(0.25);
 		if(aftermessage!="") {messages.insert(aftermessage,0);}
 	}
@@ -277,7 +266,7 @@ public class Board extends JFrame implements Runnable{
 			for(Ship s:myships) {
 				if(s.active==true&&(s.holes==s.struck)) {
 					s.active=false;
-					aftermessage="Computer sunk "+playerUsername+"'s "+s.name+'\n';
+					aftermessage="Computer sunk "+player.username+"'s "+s.name+'\n';
 				}
 			}
 			checkifgameover();
@@ -484,7 +473,7 @@ public class Board extends JFrame implements Runnable{
 	public void timedelay(double time) {
 		double start=System.currentTimeMillis();
 		while(System.currentTimeMillis()<start+time*1000);
-		//System.out.println("wait "+time+" second(s)");
+		System.out.println("wait "+time+" second(s)");
 	}
 	
 	public class textfieldlistener implements ActionListener{
@@ -512,16 +501,16 @@ public class Board extends JFrame implements Runnable{
 			winner.append("Computer Wins!");
 			System.out.println("Computer Wins!");
 		}else {
-			winner.append(playerUsername+" Wins!");
-			System.out.println(playerUsername+" Wins!");
+			winner.append(player.username+" Wins!");
+			System.out.println(player.username+" Wins!");
 		}
 		gameinprogress=false;
 	}
 	
 	public static void main(String[] args) {
-		//Board game=new Board();
-		//game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    //game.setVisible(true);    
-	    //game.setResizable(true);
+		BoardOG game=new BoardOG();
+		game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    game.setVisible(true);    
+	    game.setResizable(true);
 	}
 }
