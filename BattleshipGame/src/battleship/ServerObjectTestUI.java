@@ -78,6 +78,9 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 							}
 							else if(tempStr.equals("save")) {
 								saveGame = true;
+								String tempLoadStr = "Save flag turned";
+								outputToClient.writeObject(tempLoadStr);
+								outputToClient.flush();
 							}
 						}
 						else if(loadGame == true && saveGame == false) {

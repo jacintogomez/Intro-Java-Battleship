@@ -24,7 +24,7 @@ public class PlayerButtonUI implements ActionListener {
 	private String username;
 	private String password;
 	private boolean isNew;
-	private boolean loadedGame = false;
+	private boolean loadedGame = false, savedGame = false;
 	private static int nextId = 0;
 	private int Id;
 	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame;
@@ -38,6 +38,8 @@ public class PlayerButtonUI implements ActionListener {
 	JButton closeButton;
 	ObjectOutputStream toServer = null;
 	ObjectInputStream fromServer = null;
+	
+	testGame newGame, loadGame;
 	
 	public PlayerButtonUI(){
 		nextId++;
@@ -212,10 +214,13 @@ public class PlayerButtonUI implements ActionListener {
 			}
 		}
 		else if(cmd.equals("Start New Game")) {
-			System.out.print("Board class goes here!");
+			newGame = new testGame(this.username, this.password);
 		}
 		else if(cmd.equals("Load Existing Game")) {
 			loadGame();
+		}
+		else if(cmd.equals("Save Game")) {
+			saveGame(newGame);
 		}
 	}
 	
@@ -230,6 +235,8 @@ public class PlayerButtonUI implements ActionListener {
 		System.out.println(this.isNew);
 		enterInfoUI();
 	}
+	
+	
 	
 	public void userPwordEnter() {
 		String username = txtUser.getText().trim();
@@ -262,6 +269,43 @@ public class PlayerButtonUI implements ActionListener {
 			e.printStackTrace();
 		}
 		
+	}
+	
+public void saveGame(testGame game) {
+		if(savedGame == false) {
+			String saveStr = "save";
+			try {
+				toServer.writeObject(saveStr);
+				toServer.flush();
+				Object object = null;
+				object = fromServer.readObject();
+				String messageForPlayer = (String)object;
+				if(messageForPlayer.equals("Save flag turned")) {
+					savedGame = true;
+				}
+		        ta.append(messageForPlayer + "\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		if(savedGame == true) {
+	    	try {
+				toServer.writeObject(game);
+				toServer.flush();
+
+		        Object object = null;
+				object = fromServer.readObject();
+				String writeString = (String)object;
+				ta.append(writeString.toString() + "\n");
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void loadGame() {
