@@ -14,7 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ServerObjectTestUI extends JFrame implements Runnable {
+public class Server extends JFrame implements Runnable {
 
 	private JTextArea ta;
 	private ServerSocket serverSocket;
@@ -25,7 +25,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 	//private ObjectInputStream inputFromClient;
     //private ObjectOutputStream outputToClient;
     
-	public ServerObjectTestUI() {
+	public Server() {
 		super("Game Server");
 		ta = new JTextArea();
 		this.add(ta);
@@ -390,7 +390,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 
 	
 	public static void main(String[] args) {
-		ServerObjectTestUI s=  new ServerObjectTestUI();
+		Server s=  new Server();
 	    s.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    s.setVisible(true);
 
