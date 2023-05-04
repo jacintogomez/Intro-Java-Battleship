@@ -32,7 +32,7 @@ public class Player implements ActionListener{
 	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame;
 	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel;
 	JTextField txtUser,txtPword;
-	
+	JFrame frameNewLoad, frameEnterInfo, frameConnection, frameUserType;
 	JTextField textField = null;
 	JTextArea ta = null;
 	Socket socket = null;
@@ -68,10 +68,10 @@ public class Player implements ActionListener{
 	}
 	
 	private void connectionUI() {
-		JFrame frame = new JFrame("Connection Panel");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameConnection = new JFrame("Connection Panel");
+		frameConnection.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ta = new JTextArea(30,30);
-		frame.setLayout(new BorderLayout());
+		frameConnection.setLayout(new BorderLayout());
 	
 		JPanel topPanel = new JPanel(new GridLayout(2,1));
 		JPanel controlPanel = new JPanel();
@@ -82,21 +82,21 @@ public class Player implements ActionListener{
 		controlPanel.add(openButton);
 		controlPanel.add(closeButton);
 		topPanel.add(controlPanel);
-		frame.add(topPanel, BorderLayout.NORTH);
+		frameConnection.add(topPanel, BorderLayout.NORTH);
 	
-		frame.add(ta, BorderLayout.CENTER);
+		frameConnection.add(ta, BorderLayout.CENTER);
 		
-		frame.setSize(400, 200);
-		frame.setVisible(true);
+		frameConnection.setSize(400, 200);
+		frameConnection.setVisible(true);
 	}
 	
 	private void userTypeUI()
 	{
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400,100);
+		frameUserType = new JFrame();
+		frameUserType.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameUserType.setSize(400,100);
 		//Layout of Main Window
-		frame.setLayout(new BorderLayout());
+		frameUserType.setLayout(new BorderLayout());
 		
 		questionForUser = new JLabel("Are You a New or Existing User?");
 		JPanel pnlLabel = new JPanel();
@@ -113,16 +113,16 @@ public class Player implements ActionListener{
 		pnlButton.add(btnExistingUser);
 		
 		
-		frame.add(pnlLabel, BorderLayout.NORTH);
-		frame.add(pnlButton, BorderLayout.CENTER);
+		frameUserType.add(pnlLabel, BorderLayout.NORTH);
+		frameUserType.add(pnlButton, BorderLayout.CENTER);
 		
-		frame.setVisible(true);
+		frameUserType.setVisible(true);
 	}
 	
 	private void enterInfoUI() {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400,150);
+		frameEnterInfo = new JFrame();
+		frameEnterInfo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameEnterInfo.setSize(400,150);
 		
 		usernameLabel = new JLabel("Username: ");
 		passwordLabel = new JLabel("Password: ");
@@ -144,19 +144,19 @@ public class Player implements ActionListener{
 		
 		pnlButton.add(btnUsernameAndPassword);
 		
-		frame.add(pnlInput, BorderLayout.NORTH);
-		frame.add(pnlButton, BorderLayout.CENTER);
+		frameEnterInfo.add(pnlInput, BorderLayout.NORTH);
+		frameEnterInfo.add(pnlButton, BorderLayout.CENTER);
 		
-		frame.setVisible(true);
+		frameEnterInfo.setVisible(true);
 	}
 	
 	private void newOrLoadGameUI()
 	{
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(400,100);
+		frameNewLoad = new JFrame();
+		frameNewLoad.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameNewLoad.setSize(400,100);
 		//Layout of Main Window
-		frame.setLayout(new BorderLayout());
+		frameNewLoad.setLayout(new BorderLayout());
 		
 		newLoadGameLabel = new JLabel("Start a New Game or Load an Existing Game");
 		JPanel pnlLabel = new JPanel();
@@ -173,14 +173,20 @@ public class Player implements ActionListener{
 		pnlButton.add(btnLoadGame);
 		
 		
-		frame.add(pnlLabel, BorderLayout.NORTH);
-		frame.add(pnlButton, BorderLayout.CENTER);
+		frameNewLoad.add(pnlLabel, BorderLayout.NORTH);
+		frameNewLoad.add(pnlButton, BorderLayout.CENTER);
 		
 		//frame.pack();
-		frame.setVisible(true);
+		frameNewLoad.setVisible(true);
 	}
-	
-	
+	/*
+	public class addfirelistener implements ActionListener{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("Hey! From Player Class!\n");
+		}
+	}
+	*/
 	
 	@Override
 	public void actionPerformed(ActionEvent evt) {		
@@ -194,7 +200,7 @@ public class Player implements ActionListener{
 			existingUser();
 		}
 		else if(cmd.equals("Enter Username and Password")) {
-			System.out.println("Username and Pword!");
+			//System.out.println("Username and Pword!");
 			userPwordEnter();
 		}
 		else if(cmd.equals("Open Connection")) {
@@ -233,6 +239,7 @@ public class Player implements ActionListener{
 			}
 		}
 		else if(cmd.equals("Start New Game")) {
+			frameNewLoad.setVisible(false);
 			Board newGame = new Board(this.username, this.password);
 			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		    newGame.setVisible(true);    
@@ -240,18 +247,19 @@ public class Player implements ActionListener{
 		}
 		else if(cmd.equals("Load Existing Game")) {
 			loadGame();
+			frameNewLoad.setVisible(false);
 		}
 	}
 	
 	public void newUser() {
 		this.isNew = true;
-		System.out.println(this.isNew);
+		//System.out.println(this.isNew);
 		enterInfoUI();
 	}
 	
 	public void existingUser() {
 		this.isNew = false;
-		System.out.println(this.isNew);
+		//System.out.println(this.isNew);
 		enterInfoUI();
 	}
 	
@@ -278,6 +286,8 @@ public class Player implements ActionListener{
 	        if(messageForPlayer.equals("Welcome back!") || messageForPlayer.equals("Username and password saved!")) {
 	        	this.username = username;
 	        	this.password = password;
+	        	frameUserType.setVisible(false);
+	        	frameEnterInfo.setVisible(false);
 	        	newOrLoadGameUI();
 	        }
 		} catch (IOException e) {
