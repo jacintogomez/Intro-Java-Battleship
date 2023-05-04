@@ -81,7 +81,7 @@ public class Board extends JFrame implements Runnable{
 		setuserships();
 		enter=new JTextField(5);
 		enter.addActionListener(new textfieldlistener());
-		fire=new JButton("Fire");
+		fire=new JButton("Save Game");
 		fire.addActionListener(new addfirelistener());
 		this.setBackground(Color.LIGHT_GRAY);
 	    setSize(gamewidth,gameheight);
@@ -500,6 +500,7 @@ public class Board extends JFrame implements Runnable{
 	public class addfirelistener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			System.out.println("Hey! From Board Class!\n");
 		}
 	}
 	
