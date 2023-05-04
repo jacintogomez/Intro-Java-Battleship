@@ -102,6 +102,19 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 					        loadGame = false;
 						}
 						else if(saveGame == true && loadGame == false) {
+							testGame gameToSave = (testGame)object;
+							String gameStatus = checkGame(gameToSave);
+							if(gameStatus.equals("Game exists")) {
+								returnMessage = "You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n";
+								outputToClient.writeObject(returnMessage);
+								outputToClient.flush();
+							}
+							else if(gameStatus.equals("No such game exists")) {
+								saveGame(gameToSave);
+								returnMessage = "Game saved!";
+								outputToClient.writeObject(returnMessage);
+								outputToClient.flush();
+							}
 							
 						}
 						

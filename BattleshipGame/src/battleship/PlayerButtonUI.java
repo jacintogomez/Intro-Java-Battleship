@@ -28,7 +28,7 @@ public class PlayerButtonUI implements ActionListener {
 	private static int nextId = 0;
 	private int Id;
 	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame;
-	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel;
+	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel;
 	JTextField txtUser,txtPword;
 	
 	JTextField textField = null;
@@ -161,6 +161,33 @@ public class PlayerButtonUI implements ActionListener {
 		frame.setVisible(true);
 	}
 	
+	private void saveGameUI()
+	{
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(400,100);
+		//Layout of Main Window
+		frame.setLayout(new BorderLayout());
+		
+		saveGameLabel = new JLabel("Do you want to save this game?");
+		JPanel pnlLabel = new JPanel();
+		pnlLabel.add(saveGameLabel);
+		btnNewGame = new JButton("Save Game");
+		btnNewGame.addActionListener(this);
+		
+		
+		JPanel pnlButton = new JPanel(new GridLayout(1,1));
+		
+		pnlButton.add(btnNewGame);
+		
+		
+		frame.add(pnlLabel, BorderLayout.NORTH);
+		frame.add(pnlButton, BorderLayout.CENTER);
+		
+		//frame.pack();
+		frame.setVisible(true);
+	}
+	
 	
 	
 	@Override
@@ -215,6 +242,7 @@ public class PlayerButtonUI implements ActionListener {
 		}
 		else if(cmd.equals("Start New Game")) {
 			newGame = new testGame(this.username, this.password);
+			saveGameUI();
 		}
 		else if(cmd.equals("Load Existing Game")) {
 			loadGame();
