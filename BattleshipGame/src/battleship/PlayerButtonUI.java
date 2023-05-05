@@ -19,16 +19,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import java.util.*;
 
 public class PlayerButtonUI implements ActionListener {
 	private String username;
 	private String password;
 	private boolean isNew;
-	private boolean loadedGame = false, savedGame = false;
+	private boolean loadedGame = false, savedGame = false, deletedGame = false;
+	private int savedGameID = 0;
 	private static int nextId = 0;
 	private int Id;
-	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame;
-	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel;
+	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame;
+	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel, deleteGameLabel;
 	JTextField txtUser,txtPword;
 	
 	JTextField textField = null;
@@ -188,6 +190,38 @@ public class PlayerButtonUI implements ActionListener {
 		frame.setVisible(true);
 	}
 	
+	private void deleteGameUI()
+	{
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(1600,100);
+		//Layout of Main Window
+		frame.setLayout(new BorderLayout());
+		
+		deleteGameLabel = new JLabel("You already have a different game saved.\nUsers are permitted to have at most 1 game saved at a time.\nDo you want to delete this existing game and save your current game in its place?");
+		JPanel pnlLabel = new JPanel();
+		pnlLabel.add(deleteGameLabel);
+		btnDeleteGame = new JButton("Yes, delete previous saved game");
+		btnDeleteGame.addActionListener(this);
+		
+		btnContinueGame = new JButton("No, continue current game");
+		btnContinueGame.addActionListener(this);
+		
+		
+		JPanel pnlButton = new JPanel(new GridLayout(1,2));
+		
+		pnlButton.add(btnDeleteGame);
+		pnlButton.add(btnContinueGame);
+		
+		
+		
+		frame.add(pnlLabel, BorderLayout.NORTH);
+		frame.add(pnlButton, BorderLayout.CENTER);
+		
+		//frame.pack();
+		frame.setVisible(true);
+	}
+	
 	
 	
 	@Override
@@ -250,6 +284,12 @@ public class PlayerButtonUI implements ActionListener {
 		else if(cmd.equals("Save Game")) {
 			saveGame(newGame);
 		}
+		else if(cmd.equals("Yes, delete previous saved game")) {
+			deleteGame(newGame);
+		}
+		else if(cmd.equals("No, continue current game")) {
+			System.out.println("Nothing for ya");
+		}
 	}
 	
 	public void newUser() {
@@ -264,22 +304,28 @@ public class PlayerButtonUI implements ActionListener {
 		enterInfoUI();
 	}
 	
-	
-	
 	public void userPwordEnter() {
 		String username = txtUser.getText().trim();
 		String password = txtPword.getText().trim();
+		String messageType = "userInfo";
+		String userType = null;
+		if(this.isNew == true) {
+			userType = "new";
+		}
+		else if(this.isNew == false) {
+			userType = "existing";
+		}
 		txtUser.setText("");
 		txtPword.setText("");
-		String varToPass = null;
-		if(this.isNew == false) {
-			varToPass = username + " " + password + " existing";
-		}
-		else {
-			varToPass = username + " " + password + " new";
-		}
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		String[] userInfo = new String[3];
+		userInfo[0] = username;
+		userInfo[1] = password;
+		userInfo[2] = userType;
+		messageArray.add(userInfo);
 		try {
-			toServer.writeObject(varToPass);
+			toServer.writeObject(messageArray);
 			toServer.flush();
 			
 			Object object = null;
@@ -300,88 +346,96 @@ public class PlayerButtonUI implements ActionListener {
 	}
 	
 public void saveGame(testGame game) {
-		if(savedGame == false) {
-			String saveStr = "save";
-			try {
-				toServer.writeObject(saveStr);
-				toServer.flush();
-				Object object = null;
-				object = fromServer.readObject();
-				String messageForPlayer = (String)object;
-				if(messageForPlayer.equals("Save flag turned")) {
-					savedGame = true;
-				}
-		        ta.append(messageForPlayer + "\n");
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-		if(savedGame == true) {
-	    	try {
-				toServer.writeObject(game);
-				toServer.flush();
+		String messageType = "save";
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		messageArray.add(game);
+		messageArray.add(this.savedGameID);
+    	try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
 
-		        Object object = null;
-				object = fromServer.readObject();
-				String writeString = (String)object;
-				ta.append(writeString.toString() + "\n");
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+	        Object object = null;
+			object = fromServer.readObject();
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			
+			int gameInt = (int)retArr.get(0);
+			String gameString = (String)retArr.get(1);
+			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
+				ta.append(gameString.toString() + "\n");
+				deleteGameUI();
 			}
+			else {
+				this.savedGameID = gameInt;
+				ta.append(gameString.toString() + "\n");
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
+
 	}
 	
 	public void loadGame() {
-		if(loadedGame == false) {
-			String loadStr = "load";
-			try {
-				toServer.writeObject(loadStr);
-				toServer.flush();
-				Object object = null;
-				object = fromServer.readObject();
-				String messageForPlayer = (String)object;
-				if(messageForPlayer.equals("Load flag turned")) {
-					loadedGame = true;
-				}
-		        ta.append(messageForPlayer + "\n");
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+		String messageType = "load";
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		String[] unamePword = new String[2];
+		unamePword[0] = this.username;
+		unamePword[1] = this.password;
+		messageArray.add(unamePword);
+	
+    	try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
+			
+			String tempStr = "You do not have a game saved. Please start a new game!";
+	        Object object = null;
+			
+			object = fromServer.readObject();
+			if(object.toString().equals(tempStr.toString())) {
+				ta.append(tempStr + "\n");
 			}
+			else {
+				testGame game = (testGame)object;
+				ta.append(game.toString() + "\n");
+				game.printGrid();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
-		if(loadedGame == true) {
+	}
+	
+	public void deleteGame(testGame game) {
+		String messageType = "delete";
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		messageArray.add(game);
 		
-			String[] usernameAndPassword = new String[2];
-	    	usernameAndPassword[0] = this.username;
-	    	usernameAndPassword[1] = this.password;
-	    	try {
-				toServer.writeObject(usernameAndPassword);
-				toServer.flush();
-				
-				String tempStr = "You do not have a game saved. Please start a new game!";
-		        Object object = null;
-				
-				object = fromServer.readObject();
-				if(object.toString().equals(tempStr.toString())) {
-					ta.append(tempStr + "\n");
-				}
-				else {
-					testGame game = (testGame)object;
-					ta.append(game.toString() + "\n");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+    	try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
+
+	        Object object = null;
+			object = fromServer.readObject();
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			
+			int gameInt = (int)retArr.get(0);
+			String gameString = (String)retArr.get(1);
+			
+			this.savedGameID = gameInt;
+			ta.append(gameString.toString());
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
-  
 	}
 
 	public static void main(String[] args) {

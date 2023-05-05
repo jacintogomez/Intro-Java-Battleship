@@ -3,6 +3,7 @@ package battleship;
 import java.io.*;
 import java.net.*;
 import java.util.Date;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
@@ -22,6 +23,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 	private boolean userNamePword = false;
 	private boolean loadGame = false;
 	private boolean saveGame = false;
+	private boolean deleteGame = false;
 	//private ObjectInputStream inputFromClient;
     //private ObjectOutputStream outputToClient;
     
@@ -54,6 +56,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 	          
 		        while(true) {
 		        	String returnMessage = null;
+		        	String typeStr = null;
 		        	//inputFromClient = new ObjectInputStream(socket.getInputStream());
 
         	        Object object = null;
@@ -63,70 +66,19 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 					catch (EOFException e) {
 						e.printStackTrace();
 						break;
-					}catch (ClassNotFoundException e) {
+					}
+					catch (ClassNotFoundException e) {
 						e.printStackTrace();
 						break;
 					}
-					if(userNamePword == true) {
-						if(loadGame == false && saveGame == false) {
-							String tempStr = (String)object;
-							if(tempStr.equals("load")) {
-								loadGame = true;
-								String tempLoadStr = "Load flag turned";
-								outputToClient.writeObject(tempLoadStr);
-								outputToClient.flush();
-							}
-							else if(tempStr.equals("save")) {
-								saveGame = true;
-								String tempLoadStr = "Save flag turned";
-								outputToClient.writeObject(tempLoadStr);
-								outputToClient.flush();
-							}
-						}
-						else if(loadGame == true && saveGame == false) {
-							String[] tempStr = (String[])object;
-							String username = tempStr[0];
-							String password = tempStr[1];
-							ta.append("Username: " + username + "\nPassword: " + password + "\n");
-							
-							String statusString = checkGameForLoad(username, password);
-					        if(statusString.equals("Game exists")) {
-					        	testGame game1 = loadGame(username, password);
-					        	outputToClient.writeObject(game1);
-					        }
-					        else {
-					        	returnMessage = "You do not have a game saved.\nPlease start a new game!";
-					        	outputToClient.writeObject(returnMessage);
-					        	outputToClient.flush();
-					        }
-					        loadGame = false;
-						}
-						else if(saveGame == true && loadGame == false) {
-							testGame gameToSave = (testGame)object;
-							String gameStatus = checkGame(gameToSave);
-							if(gameStatus.equals("Game exists")) {
-								returnMessage = "You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n";
-								outputToClient.writeObject(returnMessage);
-								outputToClient.flush();
-							}
-							else if(gameStatus.equals("No such game exists")) {
-								saveGame(gameToSave);
-								returnMessage = "Game saved!";
-								outputToClient.writeObject(returnMessage);
-								outputToClient.flush();
-							}
-							
-						}
-						
-					}
-					else if(userNamePword == false) {
-						
-						String tempStr = (String)object;
-						String[] tempStrArr = tempStr.split(" ");
-						String username = tempStrArr[0];
-						String password = tempStrArr[1];
-						String isNew = tempStrArr[2];
-						ta.append(username + "\n" + password + "\n" + isNew + "\n" );
+					ArrayList<Object> sentArr = (ArrayList<Object>)object;
+					typeStr = (String)sentArr.get(0);
+					//ta.append(typeStr + "\n");
+					if(typeStr.equals("userInfo")) {
+						String[] sentStr = (String[])sentArr.get(1);
+						String username = sentStr[0];
+						String password = sentStr[1];
+						String isNew = sentStr[2];
 						if(isNew.equals("new")) {
 							String statusPassword = checkUsername(username);
 							if(statusPassword.equals("No Username")) {
@@ -158,6 +110,76 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 							}
 						}
 					}
+					else if(typeStr.equals("save")) {
+						testGame gameToSave = (testGame)sentArr.get(1);
+						int savedGameID = (int)sentArr.get(2);
+						String gameStatus = checkGame(gameToSave);
+						if(gameStatus.equals("Game exists")) {
+							int storedGameID = getSavedGameID(gameToSave);
+							if(savedGameID == storedGameID) {
+								gameToSave.setGridCell(5, 5, 2);
+								updateGame(gameToSave);
+								int gameID = getSavedGameID(gameToSave);
+								returnMessage = "Game updated!";
+								ArrayList<Object> retArrList = new ArrayList<>();
+								retArrList.add(gameID);
+								retArrList.add(returnMessage);
+								outputToClient.writeObject(retArrList);
+								outputToClient.flush();
+							}
+							else {
+								ArrayList<Object> retArrList = new ArrayList<>();
+								returnMessage = "You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n";
+								int gameID = 0;
+								retArrList.add(gameID);
+								retArrList.add(returnMessage);
+								outputToClient.writeObject(retArrList);
+								outputToClient.flush();
+							}
+						}
+						else if(gameStatus.equals("No such game exists")) {
+							saveGame(gameToSave);
+							int gameID = getSavedGameID(gameToSave);
+							returnMessage = "Game saved!";
+							ArrayList<Object> retArrList = new ArrayList<>();
+							retArrList.add(gameID);
+							retArrList.add(returnMessage);
+							outputToClient.writeObject(retArrList);
+							outputToClient.flush();
+						}
+						
+					}
+					else if(typeStr.equals("load")) {
+						String[] tempStr = (String[])sentArr.get(1);
+						String username = tempStr[0];
+						String password = tempStr[1];
+						ta.append("Username: " + username + "\nPassword: " + password + "\n");
+						
+						String statusString = checkGameForLoad(username, password);
+				        if(statusString.equals("Game exists")) {
+				        	testGame game1 = loadGame(username, password);
+				        	outputToClient.writeObject(game1);
+				        }
+				        else {
+				        	returnMessage = "You do not have a game saved.\nPlease start a new game!";
+				        	outputToClient.writeObject(returnMessage);
+				        	outputToClient.flush();
+				        }
+					}
+					else if(typeStr.equals("delete")) {
+						testGame gameToSave = (testGame)sentArr.get(1);
+						String gameUsername = gameToSave.getUsername();
+						String gamePassword = gameToSave.getPassword();
+						deleteGame(gameUsername, gamePassword);
+						saveGame(gameToSave);
+						int gameID = getSavedGameID(gameToSave);
+						returnMessage = "Game saved!";
+						ArrayList<Object> retArrList = new ArrayList<>();
+						retArrList.add(gameID);
+						retArrList.add(returnMessage);
+						outputToClient.writeObject(retArrList);
+						outputToClient.flush();
+					}
 			        
 		        }
 		        
@@ -188,7 +210,6 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 	public static String checkUsername(String username) {
 		PreparedStatement preparedStatement = null;
 		Connection connection = null;
-		testGame receivedObject = null;
 		ResultSet rs = null;
 		String retString = null;
 		try {
@@ -216,7 +237,6 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 	public static String checkUsernamePassword(String username, String password) {
 		PreparedStatement preparedStatement = null;
 		Connection connection = null;
-		testGame receivedObject = null;
 		ResultSet rs = null;
 		String retString = null;
 		try {
@@ -266,7 +286,26 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
         } 
 	}
 
-
+	public static void deleteGame(String username, String password) {
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		
+		
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
+			String queryString = "DELETE from objectstore WHERE username = ? and password = ?";
+			preparedStatement = connection.prepareStatement(queryString);
+			preparedStatement.setString(1, username);
+			preparedStatement.setString(2, password);
+			preparedStatement.executeUpdate();
+			preparedStatement.close();
+			connection.close();
+			
+		}catch (SQLException ex) {
+		    ex.printStackTrace();
+		}
+		
+	}
 
 	public static void saveUsername(String username) {
 		PreparedStatement preparedStatement;
@@ -316,6 +355,57 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 		} catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
         } 
+	}
+	
+	public static void updateGame(testGame g) {
+		PreparedStatement preparedStatement;
+		Connection connection = null;
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream out = null;
+		
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
+			out = new ObjectOutputStream(bos);
+			out.writeObject(g);
+			out.flush();
+			byte[] gameBytes = bos.toByteArray();
+			String insertString = "UPDATE objectstore SET gamedata = ? WHERE username = ? AND password = ?";
+			preparedStatement = connection.prepareStatement(insertString);
+			preparedStatement.setBytes(1, gameBytes);
+			preparedStatement.setString(2, g.getUsername());
+			preparedStatement.setString(3, g.getPassword());
+			preparedStatement.execute();
+			preparedStatement.close();
+			connection.close();
+		} catch (IOException | SQLException ex) {
+            System.out.println(ex.getMessage());
+        } 
+	}
+	
+	public static int getSavedGameID(testGame g) {
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		ResultSet rs = null;
+		String inputUsername = g.getUsername();
+		String inputPassword = g.getPassword();
+		int retID = 0;
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
+			String queryString = "SELECT id FROM objectstore WHERE username = ? and password = ?";
+			preparedStatement = connection.prepareStatement(queryString);
+			preparedStatement.setString(1, inputUsername);
+			preparedStatement.setString(2, inputPassword);
+			rs = preparedStatement.executeQuery();
+			rs.next();
+			retID = rs.getInt("id");
+			preparedStatement.close();
+			connection.close();
+			rs.close();
+		}catch (SQLException ex) {
+		    ex.printStackTrace();
+		}
+		return retID;
 	}
 	
 	public static String checkGame(testGame game) {
