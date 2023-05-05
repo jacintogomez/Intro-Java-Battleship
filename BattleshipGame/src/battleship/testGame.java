@@ -114,6 +114,24 @@ public class testGame implements Serializable {
 		return receivedObject;
 	}
 	
+	public void setGridCell(int coord1, int coord2, int value) {
+		this.gridArray[coord1][coord2] = value;
+	}
+	
+	public void printGrid() {
+		for(int i = 0; i < 10; i++) {
+			for(int j = 0; j < 10; j++) {
+				System.out.print(this.gridArray[i][j]);
+				if(j == 9) {
+					System.out.print("\n");
+				}
+				else {
+					System.out.print("\t");
+				}
+			}
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return "Game Object [Id=" + Id + ", username=" + username + ", password=" + password + "]";
