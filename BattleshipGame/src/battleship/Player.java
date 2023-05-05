@@ -301,12 +301,12 @@ public class Player implements ActionListener{
 			}
 		}
 		else if(cmd.equals("Start New Game")) {
-			frameNewLoad.setVisible(false);
+			frameNewLoad.dispose();
 			newGame = new Board(this.username, this.password);
 			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		    newGame.setVisible(true);    
 		    newGame.setResizable(true);
-		    frameNewLoad.dispose();
+		   
 		    saveGameUI();
 		}
 		else if(cmd.equals("Load Existing Game")) {
@@ -320,10 +320,12 @@ public class Player implements ActionListener{
 			saveGame(newGame);
 		}
 		else if(cmd.equals("Yes, delete previous saved game")) {
+			frameDeleteGame.dispose();
 			deleteGame(newGame);
+			
 		}
 		else if(cmd.equals("No, continue current game")) {
-			frameDeleteGame.setVisible(false);
+			frameDeleteGame.dispose();
 		}
 	}
 	

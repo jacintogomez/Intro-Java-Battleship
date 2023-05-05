@@ -136,7 +136,7 @@ public class Server extends JFrame implements Runnable {
 						else if(gameStatus.equals("No such game exists")) {
 							saveGame(gameToSave);
 							int gameID = getSavedGameID(gameToSave);
-							returnMessage = "Game saved!";
+							returnMessage = "Game saved!\n";
 							ArrayList<Object> retArrList = new ArrayList<>();
 							retArrList.add(gameID);
 							retArrList.add(returnMessage);
