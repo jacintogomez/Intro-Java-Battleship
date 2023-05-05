@@ -1,6 +1,8 @@
 package battleship;
 
-public class Coordinate{
+import java.io.Serializable;
+
+public class Coordinate implements Serializable{
 	char row;
 	int column;
 	

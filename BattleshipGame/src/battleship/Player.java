@@ -306,11 +306,14 @@ public class Player implements ActionListener{
 			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		    newGame.setVisible(true);    
 		    newGame.setResizable(true);
+		    frameNewLoad.dispose();
+		    saveGameUI();
 		}
 		else if(cmd.equals("Load Existing Game")) {
 			Board loadedGame = loadGame();
 			if(loadedGame != null) {
-				frameNewLoad.setVisible(false);
+				frameNewLoad.dispose();
+				saveGameUI();
 			}
 		}
 		else if(cmd.equals("Save Game")) {
@@ -367,6 +370,8 @@ public class Player implements ActionListener{
 	        if(messageForPlayer.equals("Welcome back!") || messageForPlayer.equals("Username and password saved!")) {
 	        	this.username = username;
 	        	this.password = password;
+	        	frameUserType.dispose();
+	        	frameEnterInfo.dispose();
 	        	newOrLoadGameUI();
 	        }
 		} catch (IOException e) {
