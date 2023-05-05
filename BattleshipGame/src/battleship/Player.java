@@ -29,10 +29,10 @@ public class Player implements ActionListener{
 	private static int nextId = 0;
 	private int Id;
 	int numberofwins;
-	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame;
-	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel;
+	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame;
+	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel, deleteGameLabel;
 	JTextField txtUser,txtPword;
-	JFrame frameNewLoad, frameEnterInfo, frameConnection, frameUserType;
+	JFrame frameNewLoad, frameEnterInfo, frameConnection, frameUserType, frameSaveGame, frameDeleteGame;
 	JTextField textField = null;
 	JTextArea ta = null;
 	Socket socket = null;
@@ -179,6 +179,66 @@ public class Player implements ActionListener{
 		//frame.pack();
 		frameNewLoad.setVisible(true);
 	}
+	
+	private void saveGameUI()
+	{
+		frameSaveGame = new JFrame();
+		frameSaveGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameSaveGame.setSize(400,100);
+		//Layout of Main Window
+		frameSaveGame.setLayout(new BorderLayout());
+		
+		saveGameLabel = new JLabel("Do you want to save this game?");
+		JPanel pnlLabel = new JPanel();
+		pnlLabel.add(saveGameLabel);
+		btnNewGame = new JButton("Save Game");
+		btnNewGame.addActionListener(this);
+		
+		
+		JPanel pnlButton = new JPanel(new GridLayout(1,1));
+		
+		pnlButton.add(btnNewGame);
+		
+		
+		frameSaveGame.add(pnlLabel, BorderLayout.NORTH);
+		frameSaveGame.add(pnlButton, BorderLayout.CENTER);
+		
+		//frame.pack();
+		frameSaveGame.setVisible(true);
+	}
+	
+	private void deleteGameUI()
+	{
+		frameDeleteGame = new JFrame();
+		frameDeleteGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameDeleteGame.setSize(1600,100);
+		//Layout of Main Window
+		frameDeleteGame.setLayout(new BorderLayout());
+		
+		deleteGameLabel = new JLabel("You already have a different game saved.\nUsers are permitted to have at most 1 game saved at a time.\nDo you want to delete this existing game and save your current game in its place?");
+		JPanel pnlLabel = new JPanel();
+		pnlLabel.add(deleteGameLabel);
+		btnDeleteGame = new JButton("Yes, delete previous saved game");
+		btnDeleteGame.addActionListener(this);
+		
+		btnContinueGame = new JButton("No, continue current game");
+		btnContinueGame.addActionListener(this);
+		
+		
+		JPanel pnlButton = new JPanel(new GridLayout(1,2));
+		
+		pnlButton.add(btnDeleteGame);
+		pnlButton.add(btnContinueGame);
+		
+		
+		
+		frameDeleteGame.add(pnlLabel, BorderLayout.NORTH);
+		frameDeleteGame.add(pnlButton, BorderLayout.CENTER);
+		
+		//frame.pack();
+		frameDeleteGame.setVisible(true);
+	}
+	
 	/*
 	public class addfirelistener implements ActionListener{
 		@Override
