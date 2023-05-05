@@ -5,6 +5,7 @@ import java.util.Random;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -17,7 +18,8 @@ import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
-public class Board extends JFrame implements Runnable{
+public class Board extends JFrame implements Runnable, Serializable {
+	private static final long serialVersionUID = 1L;
 	private static final Color[] TILE_COLORS = {
 	    Color.BLUE,   // open
 	    Color.GRAY,   // ship
@@ -89,6 +91,18 @@ public class Board extends JFrame implements Runnable{
 	    Thread t=new Thread(this);
 	    t.start();
 
+	}
+	
+	public String getUsername() {
+		return this.playerUsername;
+	}
+	
+	public String getPassword() {
+		return this.playerPassword;
+	}
+	
+	public long getSerialId() {
+		return this.serialVersionUID;
 	}
 	
 	public void run() {

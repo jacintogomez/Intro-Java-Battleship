@@ -107,13 +107,13 @@ public class Server extends JFrame implements Runnable {
 						}
 					}
 					else if(typeStr.equals("save")) {
-						testGame gameToSave = (testGame)sentArr.get(1);
+						Board gameToSave = (Board)sentArr.get(1);
 						int savedGameID = (int)sentArr.get(2);
 						String gameStatus = checkGame(gameToSave);
 						if(gameStatus.equals("Game exists")) {
 							int storedGameID = getSavedGameID(gameToSave);
 							if(savedGameID == storedGameID) {
-								gameToSave.setGridCell(5, 5, 2);
+								//gameToSave.setGridCell(5, 5, 2);
 								updateGame(gameToSave);
 								int gameID = getSavedGameID(gameToSave);
 								returnMessage = "Game updated!";
@@ -153,7 +153,7 @@ public class Server extends JFrame implements Runnable {
 						
 						String statusString = checkGameForLoad(username, password);
 				        if(statusString.equals("Game exists")) {
-				        	testGame game1 = loadGame(username, password);
+				        	Board game1 = loadGame(username, password);
 				        	outputToClient.writeObject(game1);
 				        }
 				        else {
@@ -163,7 +163,7 @@ public class Server extends JFrame implements Runnable {
 				        }
 					}
 					else if(typeStr.equals("delete")) {
-						testGame gameToSave = (testGame)sentArr.get(1);
+						Board gameToSave = (Board)sentArr.get(1);
 						String gameUsername = gameToSave.getUsername();
 						String gamePassword = gameToSave.getPassword();
 						deleteGame(gameUsername, gamePassword);
@@ -326,7 +326,7 @@ public class Server extends JFrame implements Runnable {
         } 
 	}
 
-	public static void saveGame(testGame g) {
+	public static void saveGame(Board g) {
 		PreparedStatement preparedStatement;
 		Connection connection = null;
 		
@@ -353,7 +353,7 @@ public class Server extends JFrame implements Runnable {
         } 
 	}
 	
-	public static void updateGame(testGame g) {
+	public static void updateGame(Board g) {
 		PreparedStatement preparedStatement;
 		Connection connection = null;
 		
@@ -379,7 +379,7 @@ public class Server extends JFrame implements Runnable {
         } 
 	}
 	
-	public static int getSavedGameID(testGame g) {
+	public static int getSavedGameID(Board g) {
 		PreparedStatement preparedStatement = null;
 		Connection connection = null;
 		ResultSet rs = null;
@@ -404,7 +404,7 @@ public class Server extends JFrame implements Runnable {
 		return retID;
 	}
 	
-	public static String checkGame(testGame game) {
+	public static String checkGame(Board game) {
 		PreparedStatement preparedStatement = null;
 		Connection connection = null;
 		ResultSet rs = null;
@@ -455,10 +455,10 @@ public class Server extends JFrame implements Runnable {
 		return "Game exists";
 	}
 	
-	public static testGame loadGame(String username, String password) {
+	public static Board loadGame(String username, String password) {
 		PreparedStatement preparedStatement = null;
 		Connection connection = null;
-		testGame receivedObject = null;
+		Board receivedObject = null;
 		ResultSet rs = null;
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
@@ -476,7 +476,7 @@ public class Server extends JFrame implements Runnable {
 			}
 			
 			Object deSerializedObject = objectIn.readObject();
-			receivedObject = (testGame)deSerializedObject;
+			receivedObject = (Board)deSerializedObject;
 			rs.close();
 			preparedStatement.close();
 			connection.close();

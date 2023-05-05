@@ -27,6 +27,7 @@ public class Player implements ActionListener{
 	private boolean isNew;
 	private boolean loadedGame = false;
 	private static int nextId = 0;
+	private int savedGameID = 0;
 	private int Id;
 	int numberofwins;
 	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame;
@@ -40,6 +41,7 @@ public class Player implements ActionListener{
 	JButton closeButton;
 	ObjectOutputStream toServer = null;
 	ObjectInputStream fromServer = null;
+	Board newGame = null;
 	
 	public Player(){
 		nextId++;
@@ -300,43 +302,62 @@ public class Player implements ActionListener{
 		}
 		else if(cmd.equals("Start New Game")) {
 			frameNewLoad.setVisible(false);
-			Board newGame = new Board(this.username, this.password);
+			newGame = new Board(this.username, this.password);
 			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		    newGame.setVisible(true);    
 		    newGame.setResizable(true);
 		}
 		else if(cmd.equals("Load Existing Game")) {
-			loadGame();
-			frameNewLoad.setVisible(false);
+			Board loadedGame = loadGame();
+			if(loadedGame != null) {
+				frameNewLoad.setVisible(false);
+			}
+		}
+		else if(cmd.equals("Save Game")) {
+			saveGame(newGame);
+		}
+		else if(cmd.equals("Yes, delete previous saved game")) {
+			deleteGame(newGame);
+		}
+		else if(cmd.equals("No, continue current game")) {
+			frameDeleteGame.setVisible(false);
 		}
 	}
 	
 	public void newUser() {
 		this.isNew = true;
-		//System.out.println(this.isNew);
+		System.out.println(this.isNew);
 		enterInfoUI();
 	}
 	
 	public void existingUser() {
 		this.isNew = false;
-		//System.out.println(this.isNew);
+		System.out.println(this.isNew);
 		enterInfoUI();
 	}
 	
 	public void userPwordEnter() {
 		String username = txtUser.getText().trim();
 		String password = txtPword.getText().trim();
+		String messageType = "userInfo";
+		String userType = null;
+		if(this.isNew == true) {
+			userType = "new";
+		}
+		else if(this.isNew == false) {
+			userType = "existing";
+		}
 		txtUser.setText("");
 		txtPword.setText("");
-		String varToPass = null;
-		if(this.isNew == false) {
-			varToPass = username + " " + password + " existing";
-		}
-		else {
-			varToPass = username + " " + password + " new";
-		}
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		String[] userInfo = new String[3];
+		userInfo[0] = username;
+		userInfo[1] = password;
+		userInfo[2] = userType;
+		messageArray.add(userInfo);
 		try {
-			toServer.writeObject(varToPass);
+			toServer.writeObject(messageArray);
 			toServer.flush();
 			
 			Object object = null;
@@ -346,8 +367,6 @@ public class Player implements ActionListener{
 	        if(messageForPlayer.equals("Welcome back!") || messageForPlayer.equals("Username and password saved!")) {
 	        	this.username = username;
 	        	this.password = password;
-	        	frameUserType.setVisible(false);
-	        	frameEnterInfo.setVisible(false);
 	        	newOrLoadGameUI();
 	        }
 		} catch (IOException e) {
@@ -358,52 +377,98 @@ public class Player implements ActionListener{
 		
 	}
 	
-	public void loadGame() {
-		if(loadedGame == false) {
-			String loadStr = "load";
-			try {
-				toServer.writeObject(loadStr);
-				toServer.flush();
-				Object object = null;
-				object = fromServer.readObject();
-				String messageForPlayer = (String)object;
-				if(messageForPlayer.equals("Load flag turned")) {
-					loadedGame = true;
-				}
-		        ta.append(messageForPlayer + "\n");
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+public void saveGame(Board game) {
+		String messageType = "save";
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		messageArray.add(game);
+		messageArray.add(this.savedGameID);
+    	try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
+
+	        Object object = null;
+			object = fromServer.readObject();
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			
+			int gameInt = (int)retArr.get(0);
+			String gameString = (String)retArr.get(1);
+			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
+				ta.append(gameString.toString() + "\n");
+				deleteGameUI();
 			}
+			else {
+				this.savedGameID = gameInt;
+				ta.append(gameString.toString() + "\n");
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
-		if(loadedGame == true) {
+
+	}
+	
+	public Board loadGame() {
+		String messageType = "load";
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		String[] unamePword = new String[2];
+		unamePword[0] = this.username;
+		unamePword[1] = this.password;
+		messageArray.add(unamePword);
+		Board loadedGame = null;
+	
+    	try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
+			
+			String tempStr = "You do not have a game saved. Please start a new game!";
+	        Object object = null;
+			
+			object = fromServer.readObject();
+			if(object.toString().equals(tempStr.toString())) {
+				ta.append(tempStr + "\n");
+			}
+			else {
+				loadedGame = (Board)object;
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+    	return loadedGame;
+	}
+	
+	public void deleteGame(Board game) {
+		String messageType = "delete";
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		messageArray.add(game);
 		
-			String[] usernameAndPassword = new String[2];
-	    	usernameAndPassword[0] = this.username;
-	    	usernameAndPassword[1] = this.password;
-	    	try {
-				toServer.writeObject(usernameAndPassword);
-				toServer.flush();
-				
-				String tempStr = "You do not have a game saved. Please start a new game!";
-		        Object object = null;
-				
-				object = fromServer.readObject();
-				if(object.toString().equals(tempStr.toString())) {
-					ta.append(tempStr + "\n");
-				}
-				else {
-					testGame game = (testGame)object;
-					ta.append(game.toString() + "\n");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+    	try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
+
+	        Object object = null;
+			object = fromServer.readObject();
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			
+			int gameInt = (int)retArr.get(0);
+			String gameString = (String)retArr.get(1);
+			
+			this.savedGameID = gameInt;
+			ta.append(gameString.toString());
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
-  
 	}
 
 	public static void main(String[] args) {
