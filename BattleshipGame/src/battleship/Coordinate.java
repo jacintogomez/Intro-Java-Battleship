@@ -1,4 +1,4 @@
-package Battleship;
+package battleship;
 
 public class Coordinate{
 	protected char row;
