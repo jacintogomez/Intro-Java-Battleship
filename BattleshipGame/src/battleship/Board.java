@@ -1,15 +1,17 @@
-package battleship;
+package PartIV;
 
 import java.util.Random;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.*;
 
+import PartIV.Initpanel.pressa;
+import PartIV.Initpanel.pressb;
+import PartIV.Initpanel.pressc;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,8 +20,7 @@ import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
-public class Board extends JFrame implements Runnable, Serializable {
-	private static final long serialVersionUID = 1L;
+public class Board extends JFrame implements Runnable{
 	private static final Color[] TILE_COLORS = {
 	    Color.BLUE,   // open
 	    Color.GRAY,   // ship
@@ -45,77 +46,88 @@ public class Board extends JFrame implements Runnable, Serializable {
 	private JButton fire;
 	private JTextField enter;
 	private String choice;
-//	private JLabel palerts;
-//	private JLabel calerts;
 	private JTextArea messages;
 	private JTextArea winner;
+	private JScrollPane scroll;
 	
 	private ArrayList<Ship> myships=new ArrayList<Ship>();
 	private ArrayList<Ship> opships=new ArrayList<Ship>();
 	private ImagePanel leftboard;
 	private ImagePanel rightboard;
-	private String playerUsername;
-	private String playerPassword;
+	private Player player;
+	private String username;
+	private String password;
 	private int ophitsleft;
 	private int myhitsleft;
-	/*
+	
 	public Board() {
-		//player=new Player("Jacinto","jg6243",777);
-		
-		
-	}
-	*/
-	public Board(String username, String password) {
-		//this();
-		this.playerUsername = username;
-		this.playerPassword = password;
-		
+		player=new Player("Mia","jg6243",777);
 		for(int x=0;x<10;x++) {
 			for(int y=0;y<10;y++) {
 				mygrid[x][y]=1;
 				opgrid[x][y]=1;
 			}
 		}
-		gameinprogress=true;
+		ophitsleft=myhitsleft=17;
+		createships();
+		setopponentships();
+		//setuserships();
+		randomizeuserships();
+		launchgame();
+	}
+	
+	public Board(String username,String password) {
+		this.username=username;
+		this.password=password;
+		player=new Player(username,password,777);
+		for(int x=0;x<10;x++) {
+			for(int y=0;y<10;y++) {
+				mygrid[x][y]=1;
+				opgrid[x][y]=1;
+			}
+		}
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
 		setuserships();
+		launchgame();
+	}
+	
+	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,ArrayList<Ship> opships,int myhitsleft,int ophitsleft) {
+		player=new Player(username,password,6243);
+		this.username=username;
+		this.password=password;
+		this.mygrid=mygrid;
+		this.opgrid=opgrid;
+		this.myships=myships;
+		this.opships=opships;
+		this.myhitsleft=myhitsleft;
+		this.ophitsleft=ophitsleft;
+		launchgame();
+	}
+	
+	public void launchgame() {
+		gameinprogress=true;
 		enter=new JTextField(5);
 		enter.addActionListener(new textfieldlistener());
-		fire=new JButton("Save Game");
+		fire=new JButton("Fire");
 		fire.addActionListener(new addfirelistener());
 		this.setBackground(Color.LIGHT_GRAY);
 	    setSize(gamewidth,gameheight);
 	    createpanel();
 	    Thread t=new Thread(this);
 	    t.start();
-
-	}
-	
-	public String getUsername() {
-		return this.playerUsername;
-	}
-	
-	public String getPassword() {
-		return this.playerPassword;
-	}
-	
-	public long getSerialId() {
-		return this.serialVersionUID;
 	}
 	
 	public void run() {
 		while(gameinprogress) {
 			while(choice==null) {
 				timedelay(0.25);
-				//System.out.println("waiting for input");
 			}
 			myturn();
 			leftboard.repaint();
 	    	rightboard.repaint();
 	    	computerturn();
-	    	System.out.println("new turn now");
 	    	leftboard.repaint();
 	    	rightboard.repaint();
 	    	choice=null;
@@ -145,8 +157,31 @@ public class Board extends JFrame implements Runnable, Serializable {
 	            }
 	            for (int x = 0; x < 10; x++) {
 	                for (int y = 0; y < 10; y++) {
+	                	char corner=isthisacornerm(x,y);
 	                	g.setColor(gettilecolor(mygrid[x][y],true));
-	                    g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+	                    if(corner=='n') {
+	                    	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+	                    }else {
+	                    	g.setColor(Color.BLUE);
+	                    	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+	                    	g.setColor(Color.GRAY);
+	                    	if(corner=='l') {
+	                    		g.fillRect((x * width)+xoffset+cellwidth/2+1, (y * height)+yoffset+1, width/2-2, height-2);
+		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+	                    	}
+	                    	if(corner=='r') {
+	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width/2-2, height-2);
+		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+	                    	}
+	                    	if(corner=='t') {
+	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+cellwidth/2+1, width-2, height/2-2);
+		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+	                    	}
+	                    	if(corner=='b') {
+	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height/2-2);
+		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+	                    	}
+	                    }
 	                }
 	            }
 	            for (int x = 0; x < 10; x++) {
@@ -166,7 +201,7 @@ public class Board extends JFrame implements Runnable, Serializable {
 	            }
 	            FontMetrics fm = g.getFontMetrics();
 	            g.setFont(new Font("Arial", Font.BOLD, 24));
-	            g.drawString(playerUsername,xoffset + (gridwidth - fm.stringWidth(playerUsername)) / 2,yoffset-50);
+	            g.drawString(player.username,xoffset + (gridwidth - fm.stringWidth(player.username)) / 2,yoffset-50);
 	        }
 	    };
 		leftboard=new ImagePanel(){
@@ -182,8 +217,28 @@ public class Board extends JFrame implements Runnable, Serializable {
 	            }
 	            for (int x = 0; x < 10; x++) {
 	                for (int y = 0; y < 10; y++) {
+	                	char corner=isthisacornero(x,y);
 	                	g.setColor(gettilecolor(opgrid[x][y],false));
-	                    g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+	                   	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+//	                    }else {
+//	                    	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+//	                    	if(corner=='l') {
+//	                    		g.fillRect((x * width)+xoffset+cellwidth/2+1, (y * height)+yoffset+1, width/2-2, height-2);
+//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+//	                    	}
+//	                    	if(corner=='r') {
+//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width/2-2, height-2);
+//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+//	                    	}
+//	                    	if(corner=='t') {
+//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+cellwidth/2+1, width-2, height/2-2);
+//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+//	                    	}
+//	                    	if(corner=='b') {
+//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height/2-2);
+//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+//	                    	}
+//	                    }
 	                }
 	            }
 	            for (int x = 0; x < 10; x++) {
@@ -208,12 +263,15 @@ public class Board extends JFrame implements Runnable, Serializable {
 		mainpan.setLayout(new GridLayout(1,2));
 		rightboard.add(enter,BorderLayout.SOUTH);
 		rightboard.add(fire,BorderLayout.SOUTH);
-//		palerts=new JLabel();
-//		calerts=new JLabel();
-		messages=new JTextArea();
+		messages=new JTextArea(6,0);
+		messages.setEditable(false);
+		messages.setLineWrap(true);
+		scroll=new JScrollPane(messages);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setPreferredSize(new Dimension(10, 10));
 		winner=new JTextArea();
-//		rightboard.add(palerts,BorderLayout.SOUTH);
-//		leftboard.add(calerts,BorderLayout.SOUTH);
+		winner.setEditable(false);
 		leftboard.add(messages,BorderLayout.SOUTH);
 		mainpan.add(leftboard);
 		mainpan.add(rightboard);
@@ -230,14 +288,22 @@ public class Board extends JFrame implements Runnable, Serializable {
 	
 	public void myturn() {
 		System.out.println("my turns choice is "+choice);
-		int y=reverse(choice.charAt(0));
-		int x=(choice.length()==3)?9:Integer.parseInt((""+choice.charAt(1)))-1;
+		int x=0,y=0;
+		do {
+			try {
+				y=reverse(choice.charAt(0));
+				//int num = Integer.parseInt(choice.substring(1));
+				x=(choice.length()==3)?9:Integer.parseInt((""+choice.charAt(1)))-1;
+			}catch(Exception e) {
+				System.out.println("invalid input");
+			}
+		}while(!isvalid(x,y));
 		String hitormiss="";
 		String aftermessage="";
-		if(!isvalid(x,y)) {
-			System.out.println("invalid input, your turn has been skipped");
-			return;
-		}
+//		if(!isvalid(x,y)) {
+//			System.out.println("invalid input, your turn has been skipped");
+//			return;
+//		}
 		if(opgrid[x][y]==1){
 			hitormiss="Miss";
 			opgrid[x][y]=3;
@@ -251,17 +317,20 @@ public class Board extends JFrame implements Runnable, Serializable {
 			}
 			for(Ship s:opships) {
 				System.out.println("checking");
-				if(s.active==true&&(s.holes==s.struck)) {
+				if(s.active&&(s.holes==s.struck)) {
 					s.active=false;
-					aftermessage=playerUsername+" sunk the computer's "+s.name+'\n';
+					aftermessage=player.username+" sunk the computer's "+s.name+'\n';
 				}
 			}
 			checkifgameover();
 		} //I hit a ship
 		//calerts.setText(player.username+" guesses "+choice+" - "+hitormiss);
-		messages.insert(playerUsername+" guesses "+choice+" - "+hitormiss+'\n',0);
-		timedelay(0.25);
-		if(aftermessage!="") {messages.insert(aftermessage,0);}
+		//messages.insert(player.username+" guesses "+choice+" - "+hitormiss+'\n',0);
+		//timedelay(0.25);
+		if(aftermessage!="") {
+			timedelay(0.25);
+			//messages.insert(aftermessage,0);
+		}
 	}
 			
 	public void computerturn() {
@@ -289,17 +358,19 @@ public class Board extends JFrame implements Runnable, Serializable {
 				s.checkifstruck(new Coordinate(x,y));
 			}
 			for(Ship s:myships) {
-				if(s.active==true&&(s.holes==s.struck)) {
+				if(s.active&&(s.holes==s.struck)) {
 					s.active=false;
-					aftermessage="Computer sunk "+playerUsername+"'s "+s.name+'\n';
+					aftermessage="Computer sunk "+player.username+"'s "+s.name+'\n';
 				}
 			}
 			checkifgameover();
 		} //my ship has been hit
-		//palerts.setText("Computer guesses "+computerguess+" - "+hitormiss);
-		messages.insert("Computer guesses "+computerguess+" - "+hitormiss+'\n',0);
-		timedelay(0.25);
-		if(aftermessage!="") {messages.insert(aftermessage,0);}
+		//messages.insert("Computer guesses "+computerguess+" - "+hitormiss+'\n',0);
+		//timedelay(0.25);
+		if(aftermessage!="") {
+			timedelay(0.25);
+			//messages.insert(aftermessage,0);
+		}
 	}
 		
 	public void createships() {
@@ -368,7 +439,7 @@ public class Board extends JFrame implements Runnable, Serializable {
 		return false;
 	}
 	
-	public void setuserships() {
+	public void randomizeuserships() {
 		for(Ship s:myships) {
 			int col=pickspot(10);
 			int row=pickspot(10);
@@ -387,6 +458,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 					len--;
 					row--;
 				}
+				s.coords.get(0).special='b';
+				s.coords.get(s.holes-1).special='t';
 			}
 			if(dir=="down") {
 				while(len>0&&row<=9) {
@@ -395,6 +468,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 					len--;
 					row++;
 				}
+				s.coords.get(0).special='t';
+				s.coords.get(s.holes-1).special='b';
 			}
 			if(dir=="left") {
 				while(len>0&&col>=0) {
@@ -403,6 +478,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 					len--;
 					col--;
 				}
+				s.coords.get(0).special='r';
+				s.coords.get(s.holes-1).special='l';
 			}
 			if(dir=="right") {
 				while(len>0&&col<=9) {
@@ -411,12 +488,88 @@ public class Board extends JFrame implements Runnable, Serializable {
 					len--;
 					col++;
 				}
+				s.coords.get(0).special='l';
+				s.coords.get(s.holes-1).special='r';
 			}
 		}
 //		for(Ship s:myships) {
 //			s.printcoords();
 //			System.out.println();
 //		}
+	}
+	
+	public void setuserships() {
+		boolean initialized=false;
+		for(Ship s:myships) {
+			Initpanel frame = new Initpanel("Set your "+s.name+" ("+s.holes+" spaces long)");
+	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	        frame.setVisible(true); 
+	        int counter=0;
+	        int col;
+			int row;
+			String dir;
+			int len;
+	        do {
+	        	counter++;
+	        	if(counter>1) {frame.setwarning("invalid/overlapping location; pick again");}
+	        	while(!initialized) {
+		        	System.out.println("uninitialized");
+		        	if(frame.direction!=null&&frame.number!=-1&&frame.letter!='a') {
+		        		initialized=true;
+		        	}
+		        }
+	        	System.out.println("initialized now");
+	        	initialized=false;
+	        	col=frame.number;
+				row=reverse(frame.letter);
+				dir=frame.direction;
+				len=s.getHoles();
+				System.out.println("coordinate for "+s.name+" is "+row+":"+col+" "+dir);
+	        }while(conflicts(col,row,dir,len,true));
+	        System.out.println("already out");
+	        initialized=false;
+			if(dir=="up") {
+				while(len>0&&row>=0) {
+					mygrid[col][row]=2;
+					s.addcoord(new Coordinate(col,row));
+					len--;
+					row--;
+				}
+				s.coords.get(0).special='b';
+				s.coords.get(s.holes-1).special='t';
+			}
+			if(dir=="down") {
+				while(len>0&&row<=9) {
+					mygrid[col][row]=2;
+					s.addcoord(new Coordinate(col,row));
+					len--;
+					row++;
+				}
+				s.coords.get(0).special='t';
+				s.coords.get(s.holes-1).special='b';
+			}
+			if(dir=="left") {
+				while(len>0&&col>=0) {
+					mygrid[col][row]=2;
+					s.addcoord(new Coordinate(col,row));
+					len--;
+					col--;
+				}
+				s.coords.get(0).special='r';
+				s.coords.get(s.holes-1).special='l';
+			}
+			if(dir=="right") {
+				while(len>0&&col<=9) {
+					mygrid[col][row]=2;
+					s.addcoord(new Coordinate(col,row));
+					len--;
+					col++;
+				}
+				s.coords.get(0).special='l';
+				s.coords.get(s.holes-1).special='r';
+			}
+			frame.dispose();
+		}
 	}
 	
 	public void setopponentships() {
@@ -438,6 +591,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 					len--;
 					row--;
 				}
+				s.coords.get(0).special='b';
+				s.coords.get(s.holes-1).special='t';
 			}
 			if(dir=="down") {
 				while(len>0&&row<=9) {
@@ -446,6 +601,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 					len--;
 					row++;
 				}
+				s.coords.get(0).special='t';
+				s.coords.get(s.holes-1).special='b';
 			}
 			if(dir=="left") {
 				while(len>0&&col>=0) {
@@ -454,6 +611,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 					len--;
 					col--;
 				}
+				s.coords.get(0).special='r';
+				s.coords.get(s.holes-1).special='l';
 			}
 			if(dir=="right") {
 				while(len>0&&col<=9) {
@@ -462,6 +621,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 					len--;
 					col++;
 				}
+				s.coords.get(0).special='l';
+				s.coords.get(s.holes-1).special='r';
 			}
 		}
 //		for(Ship s:opships) {
@@ -472,7 +633,7 @@ public class Board extends JFrame implements Runnable, Serializable {
 		
 	public Color gettilecolor(int code, boolean thisismygrid) {
 	    Color col=Color.BLUE;
-	    //if(!thisismygrid) {return col;}
+	    if(!thisismygrid) {return col;}
 	    if(code%2==0) {col=Color.GRAY;}
 	    return col;
 	}
@@ -498,14 +659,13 @@ public class Board extends JFrame implements Runnable, Serializable {
 	public void timedelay(double time) {
 		double start=System.currentTimeMillis();
 		while(System.currentTimeMillis()<start+time*1000);
-		//System.out.println("wait "+time+" second(s)");
+		System.out.println("wait "+time+" second(s)");
 	}
 	
 	public class textfieldlistener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			choice=enter.getText().trim();
-			//palerts.setText("the choice is "+choice);
 			System.out.println("the choice is "+choice);
 			enter.setText("");
 		}
@@ -514,29 +674,47 @@ public class Board extends JFrame implements Runnable, Serializable {
 	public class addfirelistener implements ActionListener{
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("Hey! From Board Class!\n");
 		}
 	}
 	
 	public void checkifgameover() {
-//		if(myhitsleft>0&&ophitsleft>0) {
-//			System.out.println("game continuing");
-//			return;
-//		}
-		if(myhitsleft==16) {
+		if(myhitsleft>0&&ophitsleft>0) {
+			System.out.println("game continuing");
+			return;
+		}
+		if(myhitsleft==0) {
 			winner.append("Computer Wins!");
 			System.out.println("Computer Wins!");
 		}else {
-			winner.append(playerUsername+" Wins!");
-			System.out.println(playerUsername+" Wins!");
+			winner.append(player.username+" Wins!");
+			System.out.println(player.username+" Wins!");
 		}
 		gameinprogress=false;
 	}
 	
+	public char isthisacornerm(int x,int y) {
+		Coordinate c=new Coordinate(x,y);
+		for(Ship s:myships) {
+			if(s.coords.get(0).equals(c)) {return s.coords.get(0).special;}
+			if(s.coords.get(s.holes-1).equals(c)) {return s.coords.get(s.holes-1).special;}
+		}
+		return 'n';
+	}
+	
+	public char isthisacornero(int x,int y) {
+		Coordinate c=new Coordinate(x,y);
+		for(Ship s:opships) {
+			System.out.println(s.coords.get(0).special);
+			if(s.coords.get(0).equals(c)) {return s.coords.get(0).special;}
+			if(s.coords.get(s.holes-1).equals(c)) {return s.coords.get(s.holes-1).special;}
+		}
+		return 'n';
+	}
+	
 	public static void main(String[] args) {
-		//Board game=new Board();
-		//game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    //game.setVisible(true);    
-	    //game.setResizable(true);
+		Board game=new Board();
+		game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    game.setVisible(true);    
+	    game.setResizable(true);
 	}
 }

@@ -1,14 +1,13 @@
-package battleship;
+package PartIV;
 
-import java.io.Serializable;
 import java.util.*;
 
-public class Ship implements Serializable{
+public class Ship{
 	protected String name;
 	protected int holes;
 	protected int struck;
 	protected boolean active;
-	private ArrayList<Coordinate> coords;
+	protected ArrayList<Coordinate> coords;
 	
 	public Ship(String name,int holes) {
 		this(name,holes,0,true);
@@ -24,6 +23,7 @@ public class Ship implements Serializable{
 	
 	public void checkifstruck(Coordinate targ) {
 		for(Coordinate c:coords) {
+			System.out.println(this.toString()+" and "+c.toString());
 			if(targ.equals(c)) {
 				struck++;
 				break;

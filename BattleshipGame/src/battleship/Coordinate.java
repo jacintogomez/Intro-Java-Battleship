@@ -1,14 +1,19 @@
-package battleship;
+package PartIV;
 
-import java.io.Serializable;
-
-public class Coordinate implements Serializable{
-	char row;
-	int column;
+public class Coordinate{
+	protected char row;
+	protected int column;
+	protected int rawcolumn;
+	protected int rawrow;
+	protected char special;
 	
 	public Coordinate(int column,int row) {
+		this.rawrow=row;
+		this.rawcolumn=column;
 		this.row=convert(row);
 		this.column=column+1;
+		this.special='n';
+		//n=normal,l=left,r=right,t=top,b=bottom
 	}
 	
 	public char convert(int row) {
