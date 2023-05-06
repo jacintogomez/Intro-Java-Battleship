@@ -1,8 +1,9 @@
 package battleship;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Ship{
+public class Ship implements Serializable {
 	protected String name;
 	protected int holes;
 	protected int struck;

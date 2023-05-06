@@ -5,13 +5,10 @@ import java.util.Random;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.*;
-
-import PartIV.Initpanel.pressa;
-import PartIV.Initpanel.pressb;
-import PartIV.Initpanel.pressc;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,7 +17,7 @@ import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 
-public class Board extends JFrame implements Runnable{
+public class Board extends JFrame implements Runnable, Serializable {
 	private static final Color[] TILE_COLORS = {
 	    Color.BLUE,   // open
 	    Color.GRAY,   // ship
@@ -30,6 +27,7 @@ public class Board extends JFrame implements Runnable{
 	private static final String[] directions= {"up","down","left","right"};
 	
 	//1=open, 2=ship, 3=miss, 4=hit
+	private static final long serialVersionUID = 1L;
 	private int gamewidth=1000;
 	private int gameheight=700;
 	private int gridwidth=350;
@@ -54,14 +52,12 @@ public class Board extends JFrame implements Runnable{
 	private ArrayList<Ship> opships=new ArrayList<Ship>();
 	private ImagePanel leftboard;
 	private ImagePanel rightboard;
-	private Player player;
 	private String username;
 	private String password;
 	private int ophitsleft;
 	private int myhitsleft;
 	
 	public Board() {
-		player=new Player("Mia","jg6243",777);
 		for(int x=0;x<10;x++) {
 			for(int y=0;y<10;y++) {
 				mygrid[x][y]=1;
@@ -79,7 +75,6 @@ public class Board extends JFrame implements Runnable{
 	public Board(String username,String password) {
 		this.username=username;
 		this.password=password;
-		player=new Player(username,password,777);
 		for(int x=0;x<10;x++) {
 			for(int y=0;y<10;y++) {
 				mygrid[x][y]=1;
@@ -93,8 +88,8 @@ public class Board extends JFrame implements Runnable{
 		launchgame();
 	}
 	
-	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,ArrayList<Ship> opships,int myhitsleft,int ophitsleft) {
-		player=new Player(username,password,6243);
+	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,
+			ArrayList<Ship> opships,int myhitsleft,int ophitsleft) {
 		this.username=username;
 		this.password=password;
 		this.mygrid=mygrid;
@@ -104,6 +99,18 @@ public class Board extends JFrame implements Runnable{
 		this.myhitsleft=myhitsleft;
 		this.ophitsleft=ophitsleft;
 		launchgame();
+	}
+	
+	public String getUsername() {
+		return this.username;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
+
+	public long getSerialId() {
+		return this.serialVersionUID;
 	}
 	
 	public void launchgame() {
@@ -201,7 +208,7 @@ public class Board extends JFrame implements Runnable{
 	            }
 	            FontMetrics fm = g.getFontMetrics();
 	            g.setFont(new Font("Arial", Font.BOLD, 24));
-	            g.drawString(player.username,xoffset + (gridwidth - fm.stringWidth(player.username)) / 2,yoffset-50);
+	            g.drawString(username,xoffset + (gridwidth - fm.stringWidth(username)) / 2,yoffset-50);
 	        }
 	    };
 		leftboard=new ImagePanel(){
@@ -319,7 +326,7 @@ public class Board extends JFrame implements Runnable{
 				System.out.println("checking");
 				if(s.active&&(s.holes==s.struck)) {
 					s.active=false;
-					aftermessage=player.username+" sunk the computer's "+s.name+'\n';
+					aftermessage=username+" sunk the computer's "+s.name+'\n';
 				}
 			}
 			checkifgameover();
@@ -360,7 +367,7 @@ public class Board extends JFrame implements Runnable{
 			for(Ship s:myships) {
 				if(s.active&&(s.holes==s.struck)) {
 					s.active=false;
-					aftermessage="Computer sunk "+player.username+"'s "+s.name+'\n';
+					aftermessage="Computer sunk "+ username+"'s "+s.name+'\n';
 				}
 			}
 			checkifgameover();
@@ -686,8 +693,8 @@ public class Board extends JFrame implements Runnable{
 			winner.append("Computer Wins!");
 			System.out.println("Computer Wins!");
 		}else {
-			winner.append(player.username+" Wins!");
-			System.out.println(player.username+" Wins!");
+			winner.append(username+" Wins!");
+			System.out.println(username+" Wins!");
 		}
 		gameinprogress=false;
 	}

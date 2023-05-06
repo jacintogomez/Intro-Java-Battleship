@@ -5,11 +5,12 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.Serializable;
 import java.text.DecimalFormat;
 
 import javax.swing.*;
 
-public class Initpanel extends JFrame{
+public class Initpanel extends JFrame implements Serializable {
 	
 	JLabel display;
 	JLabel warning;
