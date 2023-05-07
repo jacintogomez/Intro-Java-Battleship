@@ -109,14 +109,17 @@ public class Server extends JFrame implements Runnable {
 					else if(typeStr.equals("save")) {
 						Board gameToSave = (Board)sentArr.get(1);
 						int savedGameID = (int)sentArr.get(2);
+						ta.append("Saved Game ID: " + savedGameID + "\n");
 						String gameStatus = checkGame(gameToSave);
 						if(gameStatus.equals("Game exists")) {
 							int storedGameID = getSavedGameID(gameToSave);
+							ta.append("Stored Game ID: " + savedGameID + "\n");
 							if(savedGameID == storedGameID) {
 								//gameToSave.setGridCell(5, 5, 2);
+								ta.append("About to update game!");
 								updateGame(gameToSave);
 								int gameID = getSavedGameID(gameToSave);
-								returnMessage = "Game updated!";
+								returnMessage = "Game updated!\n";
 								ArrayList<Object> retArrList = new ArrayList<>();
 								retArrList.add(gameID);
 								retArrList.add(returnMessage);
@@ -154,7 +157,13 @@ public class Server extends JFrame implements Runnable {
 						String statusString = checkGameForLoad(username, password);
 				        if(statusString.equals("Game exists")) {
 				        	Board game1 = loadGame(username, password);
-				        	outputToClient.writeObject(game1);
+				        	int gameID = getSavedGameID(game1);
+				        	returnMessage = "Game loaded!\n";
+				        	ArrayList<Object> retArrList = new ArrayList<>();
+							retArrList.add(gameID);
+							retArrList.add(returnMessage);
+							retArrList.add(game1);
+				        	outputToClient.writeObject(retArrList);
 				        }
 				        else {
 				        	returnMessage = "You do not have a game saved.\nPlease start a new game!";
@@ -169,7 +178,7 @@ public class Server extends JFrame implements Runnable {
 						deleteGame(gameUsername, gamePassword);
 						saveGame(gameToSave);
 						int gameID = getSavedGameID(gameToSave);
-						returnMessage = "Game saved!";
+						returnMessage = "Game saved!\n";
 						ArrayList<Object> retArrList = new ArrayList<>();
 						retArrList.add(gameID);
 						retArrList.add(returnMessage);
@@ -348,9 +357,12 @@ public class Server extends JFrame implements Runnable {
 			preparedStatement.execute();
 			preparedStatement.close();
 			connection.close();
+			bos.close();
+			out.close();
 		} catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
-        } 
+        }
+		
 	}
 	
 	public static void updateGame(Board g) {
@@ -371,9 +383,11 @@ public class Server extends JFrame implements Runnable {
 			preparedStatement.setBytes(1, gameBytes);
 			preparedStatement.setString(2, g.getUsername());
 			preparedStatement.setString(3, g.getPassword());
-			preparedStatement.execute();
+			preparedStatement.executeUpdate();
 			preparedStatement.close();
 			connection.close();
+			bos.close();
+			out.close();
 		} catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
         } 

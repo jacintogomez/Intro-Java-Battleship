@@ -58,6 +58,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 	private int myhitsleft;
 	
 	public Board() {
+		this.username = "Jacinto";
+		this.password = "12345";
 		for(int x=0;x<10;x++) {
 			for(int y=0;y<10;y++) {
 				mygrid[x][y]=1;
@@ -67,8 +69,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		//setuserships();
-		randomizeuserships();
+		setuserships();
+		//randomizeuserships();
 		launchgame();
 	}
 	
@@ -84,7 +86,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		setuserships();
+		//setuserships();
+		randomizeuserships();
 		launchgame();
 	}
 	
@@ -99,6 +102,30 @@ public class Board extends JFrame implements Runnable, Serializable {
 		this.myhitsleft=myhitsleft;
 		this.ophitsleft=ophitsleft;
 		launchgame();
+	}
+	
+	public int[][] getMyGrid(){
+		return this.mygrid;
+	}
+	
+	public int[][] getOpGrid(){
+		return this.opgrid;
+	}
+	
+	public ArrayList<Ship> getMyships(){
+		return this.myships;
+	}
+	
+	public ArrayList<Ship> getOpships(){
+		return this.opships;
+	}
+	
+	public int getMyhitsleft() {
+		return this.myhitsleft;
+	}
+	
+	public int getOphitsleft() {
+		return this.ophitsleft;
 	}
 	
 	public String getUsername() {
@@ -666,7 +693,7 @@ public class Board extends JFrame implements Runnable, Serializable {
 	public void timedelay(double time) {
 		double start=System.currentTimeMillis();
 		while(System.currentTimeMillis()<start+time*1000);
-		System.out.println("wait "+time+" second(s)");
+		//System.out.println("wait "+time+" second(s)");
 	}
 	
 	public class textfieldlistener implements ActionListener{
@@ -711,7 +738,7 @@ public class Board extends JFrame implements Runnable, Serializable {
 	public char isthisacornero(int x,int y) {
 		Coordinate c=new Coordinate(x,y);
 		for(Ship s:opships) {
-			System.out.println(s.coords.get(0).special);
+			//System.out.println(s.coords.get(0).special);
 			if(s.coords.get(0).equals(c)) {return s.coords.get(0).special;}
 			if(s.coords.get(s.holes-1).equals(c)) {return s.coords.get(s.holes-1).special;}
 		}

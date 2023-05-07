@@ -302,6 +302,7 @@ public class Player implements ActionListener {
 		}
 		else if(cmd.equals("Start New Game")) {
 			frameNewLoad.dispose();
+			//System.out.println("BLAHBLAHBLAH" + this.username + "\n" + this.password + "BLAHBLAHBLAH");
 			newGame = new Board(this.username, this.password);
 			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		    newGame.setVisible(true);    
@@ -313,6 +314,19 @@ public class Player implements ActionListener {
 			Board loadedGame = loadGame();
 			if(loadedGame != null) {
 				frameNewLoad.dispose();
+				String tempUsername = loadedGame.getUsername();
+				String tempPassword = loadedGame.getPassword();
+				int[][] tempMygrid = loadedGame.getMyGrid();
+				int[][] tempOpgrid = loadedGame.getOpGrid();
+				ArrayList<Ship> tempMyships = loadedGame.getMyships();
+				ArrayList<Ship> tempOpships = loadedGame.getOpships();
+				int tempMyhitsleft = loadedGame.getMyhitsleft();
+				int tempOphitsleft = loadedGame.getOphitsleft();
+				newGame = new Board(tempUsername,tempPassword,tempMygrid,tempOpgrid,tempMyships,
+						tempOpships,tempMyhitsleft,tempOphitsleft);
+				newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			    newGame.setVisible(true);    
+			    newGame.setResizable(true);
 				saveGameUI();
 			}
 		}
@@ -401,12 +415,13 @@ public void saveGame(Board game) {
 			int gameInt = (int)retArr.get(0);
 			String gameString = (String)retArr.get(1);
 			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
-				ta.append(gameString.toString() + "\n");
+				ta.append(gameString.toString());
 				deleteGameUI();
 			}
 			else {
 				this.savedGameID = gameInt;
-				ta.append(gameString.toString() + "\n");
+				ta.append(gameString.toString());
+				ta.append("Game ID: " + this.savedGameID + "\n");
 			}
 
 		} catch (IOException e) {
@@ -439,7 +454,13 @@ public void saveGame(Board game) {
 				ta.append(tempStr + "\n");
 			}
 			else {
-				loadedGame = (Board)object;
+				ArrayList<Object> retArr = (ArrayList<Object>)object;
+				int gameInt = (int)retArr.get(0);
+				String gameString = (String)retArr.get(1);
+				loadedGame = (Board)retArr.get(2);
+				this.savedGameID = gameInt;
+				ta.append("Game ID: " + this.savedGameID + "\n");
+				ta.append(gameString.toString());
 				
 			}
 		} catch (IOException e) {
