@@ -86,8 +86,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		//setuserships();
-		randomizeuserships();
+		setuserships();
+		//randomizeuserships();
 		launchgame();
 	}
 	
@@ -548,12 +548,15 @@ public class Board extends JFrame implements Runnable, Serializable {
 	        do {
 	        	counter++;
 	        	if(counter>1) {frame.setwarning("invalid/overlapping location; pick again");}
-	        	while(!initialized) {
+	        	synchronized(this) {
+	        		while(!initialized) {
+	        	
 		        	System.out.println("uninitialized");
 		        	if(frame.direction!=null&&frame.number!=-1&&frame.letter!='a') {
 		        		initialized=true;
 		        	}
 		        }
+	        	}
 	        	System.out.println("initialized now");
 	        	initialized=false;
 	        	col=frame.number;
@@ -695,7 +698,7 @@ public class Board extends JFrame implements Runnable, Serializable {
 	public void timedelay(double time) {
 		double start=System.currentTimeMillis();
 		while(System.currentTimeMillis()<start+time*1000);
-		//System.out.println("wait "+time+" second(s)");
+		System.out.println("wait "+time+" second(s)");
 	}
 	
 	public class textfieldlistener implements ActionListener{
@@ -740,7 +743,7 @@ public class Board extends JFrame implements Runnable, Serializable {
 	public char isthisacornero(int x,int y) {
 		Coordinate c=new Coordinate(x,y);
 		for(Ship s:opships) {
-			//System.out.println(s.coords.get(0).special);
+			System.out.println(s.coords.get(0).special);
 			if(s.coords.get(0).equals(c)) {return s.coords.get(0).special;}
 			if(s.coords.get(s.holes-1).equals(c)) {return s.coords.get(s.holes-1).special;}
 		}
