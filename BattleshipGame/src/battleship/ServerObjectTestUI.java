@@ -74,7 +74,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 					}
 					ArrayList<Object> sentArr = (ArrayList<Object>)object;
 					typeStr = (String)sentArr.get(0);
-					//ta.append(typeStr + "\n");
+					ta.append(typeStr + "\n");
 					if(typeStr.equals("userInfo")) {
 						String[] sentStr = (String[])sentArr.get(1);
 						String username = sentStr[0];
@@ -183,6 +183,12 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 						retArrList.add(returnMessage);
 						outputToClient.writeObject(retArrList);
 						outputToClient.flush();
+					}
+					else if(typeStr.equals("test")) {
+						System.out.println("test");
+						//returnMessage = "Hi!";
+						//outputToClient.writeObject(returnMessage);
+						//outputToClient.flush();
 					}
 			        
 		        }

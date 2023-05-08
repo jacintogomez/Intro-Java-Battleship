@@ -275,8 +275,13 @@ public class PlayerButtonUI implements ActionListener {
 			}
 		}
 		else if(cmd.equals("Start New Game")) {
-			newGame = new testGame(this.username, this.password);
-			saveGameUI();
+			try {
+				newGame = new testGame(this.username, this.password, this.socket);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//saveGameUI();
 		}
 		else if(cmd.equals("Load Existing Game")) {
 			loadGame();
