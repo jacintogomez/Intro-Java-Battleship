@@ -347,6 +347,7 @@ public class PlayerButtonUI implements ActionListener {
 	
 public void saveGame(testGame game) {
 		String messageType = "save";
+		//game.printGrid();
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
 		messageArray.add(game);

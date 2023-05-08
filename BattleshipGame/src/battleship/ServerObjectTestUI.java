@@ -24,6 +24,7 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 	private boolean loadGame = false;
 	private boolean saveGame = false;
 	private boolean deleteGame = false;
+	private int setNum = 2;
 	//private ObjectInputStream inputFromClient;
     //private ObjectOutputStream outputToClient;
     
@@ -117,7 +118,10 @@ public class ServerObjectTestUI extends JFrame implements Runnable {
 						if(gameStatus.equals("Game exists")) {
 							int storedGameID = getSavedGameID(gameToSave);
 							if(savedGameID == storedGameID) {
-								gameToSave.setGridCell(5, 5, 2);
+								gameToSave.setGridCell(5, 5, setNum);
+								setNum++;
+								gameToSave.printGrid();
+								ta.append("About to update!\n");
 								updateGame(gameToSave);
 								int gameID = getSavedGameID(gameToSave);
 								returnMessage = "Game updated!";
