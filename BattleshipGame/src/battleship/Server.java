@@ -20,6 +20,7 @@ public class Server extends JFrame implements Runnable {
 	private JTextArea ta;
 	private ServerSocket serverSocket;
 	private Socket socket;
+	ArrayList<Object> sentArr;
 	//private ObjectInputStream inputFromClient;
     //private ObjectOutputStream outputToClient;
     
@@ -53,11 +54,15 @@ public class Server extends JFrame implements Runnable {
 		        while(true) {
 		        	String returnMessage = null;
 		        	String typeStr = null;
+		        	
 		        	//inputFromClient = new ObjectInputStream(socket.getInputStream());
 
         	        Object object = null;
+        	        
 					try {
 						object = inputFromClient.readObject();
+						//sentArr.clear();
+						sentArr = (ArrayList<Object>)object;
 					} 
 					catch (EOFException e) {
 						e.printStackTrace();
@@ -67,9 +72,9 @@ public class Server extends JFrame implements Runnable {
 						e.printStackTrace();
 						break;
 					}
-					ArrayList<Object> sentArr = (ArrayList<Object>)object;
+					
 					typeStr = (String)sentArr.get(0);
-					//ta.append(typeStr + "\n");
+					ta.append(typeStr + "\n");
 					if(typeStr.equals("userInfo")) {
 						String[] sentStr = (String[])sentArr.get(1);
 						String username = sentStr[0];
@@ -108,15 +113,13 @@ public class Server extends JFrame implements Runnable {
 					}
 					else if(typeStr.equals("save")) {
 						Board gameToSave = (Board)sentArr.get(1);
+						System.out.println("Saved Game Grid: \n");
+						gameToSave.printGrid();
 						int savedGameID = (int)sentArr.get(2);
-						ta.append("Saved Game ID: " + savedGameID + "\n");
 						String gameStatus = checkGame(gameToSave);
 						if(gameStatus.equals("Game exists")) {
 							int storedGameID = getSavedGameID(gameToSave);
-							ta.append("Stored Game ID: " + savedGameID + "\n");
 							if(savedGameID == storedGameID) {
-								//gameToSave.setGridCell(5, 5, 2);
-								ta.append("About to update game!");
 								updateGame(gameToSave);
 								int gameID = getSavedGameID(gameToSave);
 								returnMessage = "Game updated!\n";
@@ -125,6 +128,8 @@ public class Server extends JFrame implements Runnable {
 								retArrList.add(returnMessage);
 								outputToClient.writeObject(retArrList);
 								outputToClient.flush();
+								sentArr.clear();
+								gameToSave = null;
 							}
 							else {
 								ArrayList<Object> retArrList = new ArrayList<>();

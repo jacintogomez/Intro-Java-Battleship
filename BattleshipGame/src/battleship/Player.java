@@ -399,6 +399,8 @@ public class Player implements ActionListener {
 	}
 	
 public void saveGame(Board game) {
+		System.out.println("Check game to save: \n");
+		game.printGrid();
 		String messageType = "save";
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
@@ -429,6 +431,8 @@ public void saveGame(Board game) {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+    	//frameSaveGame.dispose();
+    	//saveGameUI();
 
 	}
 	
@@ -461,6 +465,8 @@ public void saveGame(Board game) {
 				this.savedGameID = gameInt;
 				ta.append("Game ID: " + this.savedGameID + "\n");
 				ta.append(gameString.toString());
+				System.out.println("Loaded Game Grid: \n");
+				loadedGame.printGrid();
 				
 			}
 		} catch (IOException e) {
@@ -468,6 +474,7 @@ public void saveGame(Board game) {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+    	
     	return loadedGame;
 	}
 	

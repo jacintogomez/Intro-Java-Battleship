@@ -361,6 +361,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 		//calerts.setText(player.username+" guesses "+choice+" - "+hitormiss);
 		//messages.insert(player.username+" guesses "+choice+" - "+hitormiss+'\n',0);
 		//timedelay(0.25);
+		System.out.println("Myturn grid: \n");
+		printGrid();
 		if(aftermessage!="") {
 			timedelay(0.25);
 			//messages.insert(aftermessage,0);
@@ -745,10 +747,23 @@ public class Board extends JFrame implements Runnable, Serializable {
 		return 'n';
 	}
 	
+	public void printGrid() {
+		for(int x=0;x<10;x++) {
+			for(int y=0;y<10;y++) {	
+				System.out.print(opgrid[y][x] + "\t");
+				if(y == 9) {
+					System.out.print("\n");
+				}
+			}
+		}
+		System.out.println("\n");
+	}
+	
 	public static void main(String[] args) {
-		Board game=new Board();
+		Board game=new Board("me","12345");
 		game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    game.setVisible(true);    
 	    game.setResizable(true);
+	    game.printGrid();
 	}
 }
