@@ -86,8 +86,8 @@ public class Board extends JFrame implements Runnable, Serializable {
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		setuserships();
-		//randomizeuserships();
+		//setuserships();
+		randomizeuserships();
 		launchgame();
 	}
 	
