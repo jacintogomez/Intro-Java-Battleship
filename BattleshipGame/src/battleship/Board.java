@@ -96,8 +96,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		setuserships();
-		//randomizeuserships();
+		//setuserships();
+		randomizeuserships();
 		launchgame();
 	}
 	
@@ -734,7 +734,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public void timedelay(double time) {
 		double start=System.currentTimeMillis();
 		while(System.currentTimeMillis()<start+time*1000);
-		System.out.println("wait "+time+" second(s)");
+		//System.out.println("wait "+time+" second(s)");
 	}
 	
 	public class textfieldlistener implements ActionListener{
@@ -833,7 +833,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public char isthisacornero(int x,int y) {
 		Coordinate c=new Coordinate(x,y);
 		for(Ship s:opships) {
-			System.out.println(s.coords.get(0).special);
+			//System.out.println(s.coords.get(0).special);
 			if(s.coords.get(0).equals(c)) {return s.coords.get(0).special;}
 			if(s.coords.get(s.holes-1).equals(c)) {return s.coords.get(s.holes-1).special;}
 		}
@@ -879,8 +879,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			int gameInt = (int)retArr.get(0);
 			String gameString = (String)retArr.get(1);
 			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
-				messages.append(gameString.toString() + "\n");
+				messages.append(gameString.toString());
 				deleteGameUI();
+			}
+			else if(gameString.equals("An earlier version of this game is saved.\n Updating game to current state.\n")) {
+				messages.append(gameString.toString());
+				updateGame();
 			}
 			else {
 				this.savedGameID = gameInt;
@@ -893,6 +897,45 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			e.printStackTrace();
 		}
 
+	}
+	
+	public void updateGame() {
+		String messageType = "update";
+		//this.setGridCell(5, 5, setNum);
+		//setNum++;
+		this.printGrid();
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		messageArray.add(this.username);
+		messageArray.add(this.password);
+		messageArray.add(this.mygrid);
+		messageArray.add(this.opgrid);
+		messageArray.add(this.myships);
+		messageArray.add(this.opships);
+		messageArray.add(this.myhitsleft);
+		messageArray.add(this.ophitsleft);
+		messageArray.add(this.savedGameID);
+		
+		try {
+			toServer.reset();
+			toServer.writeObject(messageArray);
+			toServer.flush();
+
+	        Object object = null;
+			object = fromServer.readObject();
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			
+			int gameInt = (int)retArr.get(0);
+			String gameString = (String)retArr.get(1);
+			
+			this.savedGameID = gameInt;
+			messages.append(gameString.toString());
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void deleteGameUI()

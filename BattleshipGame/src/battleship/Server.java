@@ -22,6 +22,8 @@ public class Server extends JFrame implements Runnable {
 	private ServerSocket serverSocket;
 	private Socket socket;
 	private int setNum = 2;
+	private boolean saveFlag = false;
+	private boolean loadFlag = false;
 	//private ObjectInputStream inputFromClient;
     //private ObjectOutputStream outputToClient;
     
@@ -81,16 +83,17 @@ public class Server extends JFrame implements Runnable {
 	    public void run() {
 	      try {
 	       
-	        	ObjectInputStream inputFromClient = new ObjectInputStream(socket.getInputStream());
+	    	  	ObjectInputStream inputFromClient = new ObjectInputStream(socket.getInputStream());
 		        ObjectOutputStream outputToClient = new ObjectOutputStream(socket.getOutputStream());
-	          
 		        while(true) {
+		        	
 		        	String returnMessage = null;
 		        	String typeStr = null;
 		        	//inputFromClient = new ObjectInputStream(socket.getInputStream());
 
         	        Object object = null;
 					try {
+						
 						object = inputFromClient.readObject();
 					} 
 					catch (EOFException e) {
@@ -152,20 +155,17 @@ public class Server extends JFrame implements Runnable {
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false);
 						String gameStatus = checkGame(gameToSave);
 						if(gameStatus.equals("Game exists")) {
-							int storedGameID = getSavedGameID(gameToSave);
-							if(savedGameID == storedGameID) {
-								gameToSave.printGrid();
-								ta.append("About to update!\n");
-								updateGame(gameToSave);
-								int gameID = getSavedGameID(gameToSave);
-								returnMessage = "Game updated!";
+							if(saveFlag == true || (saveFlag == false && loadFlag == true)) {
 								ArrayList<Object> retArrList = new ArrayList<>();
+								returnMessage = "An earlier version of this game is saved.\n Updating game to current state.\n";
+								int gameID = 0;
 								retArrList.add(gameID);
 								retArrList.add(returnMessage);
 								outputToClient.writeObject(retArrList);
 								outputToClient.flush();
 							}
-							else {
+							
+							else if(saveFlag == false && loadFlag == false){
 								ArrayList<Object> retArrList = new ArrayList<>();
 								returnMessage = "You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n";
 								int gameID = 0;
@@ -177,6 +177,7 @@ public class Server extends JFrame implements Runnable {
 						}
 						else if(gameStatus.equals("No such game exists")) {
 							saveGame(gameToSave);
+							saveFlag = true;
 							int gameID = getSavedGameID(gameToSave);
 							returnMessage = "Game saved!";
 							ArrayList<Object> retArrList = new ArrayList<>();
@@ -196,6 +197,7 @@ public class Server extends JFrame implements Runnable {
 						String statusString = checkGameForLoad(username, password);
 				        if(statusString.equals("Game exists")) {
 				        	Board game1 = loadGame(username, password);
+				        	loadFlag = true;
 				        	int gameID = getSavedGameID(game1);
 				        	returnMessage = "Game loaded!\n";
 				        	ArrayList<Object> retArrList = new ArrayList<>();
@@ -224,6 +226,7 @@ public class Server extends JFrame implements Runnable {
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false);
 						deleteGame(tempUsername, tempPassword);
 						saveGame(gameToSave);
+						saveFlag = true;
 						int gameID = getSavedGameID(gameToSave);
 						returnMessage = "Game saved!";
 						ArrayList<Object> retArrList = new ArrayList<>();
@@ -237,6 +240,30 @@ public class Server extends JFrame implements Runnable {
 						//returnMessage = "Hi!";
 						//outputToClient.writeObject(returnMessage);
 						//outputToClient.flush();
+					}
+					else if(typeStr.equals("update")) {
+						String tempUsername = (String)sentArr.get(1);
+						String tempPassword = (String)sentArr.get(2);
+						int[][] tempMyGrid = (int[][])sentArr.get(3);
+						int[][] tempOpGrid = (int[][])sentArr.get(4);
+						ArrayList<Ship> tempMyship = (ArrayList<Ship>)sentArr.get(5);
+						ArrayList<Ship> tempOpship = (ArrayList<Ship>)sentArr.get(6);
+						int tempMyHitsLeft = (int)sentArr.get(7);
+						int tempOpHitsLeft = (int)sentArr.get(8);
+						int savedGameID = (int)sentArr.get(9);
+						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
+								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false);
+						gameToSave.printGrid();
+						ta.append("About to update!\n");
+						updateGame(gameToSave);
+						int gameID = getSavedGameID(gameToSave);
+						returnMessage = "Game updated!";
+						ArrayList<Object> retArrList = new ArrayList<>();
+						retArrList.add(gameID);
+						retArrList.add(returnMessage);
+						outputToClient.writeObject(retArrList);
+						outputToClient.flush();
+
 					}
 			        
 		        }
