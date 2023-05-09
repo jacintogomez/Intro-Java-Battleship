@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import java.nio.ByteBuffer;
@@ -20,14 +21,15 @@ public class Server extends JFrame implements Runnable {
 	private JTextArea ta;
 	private ServerSocket serverSocket;
 	private Socket socket;
-	ArrayList<Object> sentArr;
+	private int setNum = 2;
 	//private ObjectInputStream inputFromClient;
     //private ObjectOutputStream outputToClient;
     
 	public Server() {
 		super("Game Server");
 		ta = new JTextArea();
-		this.add(ta);
+		JScrollPane sp = new JScrollPane(ta);
+		this.add(sp);
 
 	    setSize(400, 200);
 	    Thread t = new Thread(this);
@@ -46,23 +48,50 @@ public class Server extends JFrame implements Runnable {
 		        socket = serverSocket.accept();
 		        InetAddress inetAddress = socket.getInetAddress();
 	        	ta.append("Got connection... from " + inetAddress.getHostName() + "("+inetAddress.getHostAddress()+")\n");
-		  
-		        
-		        ObjectInputStream inputFromClient = new ObjectInputStream(socket.getInputStream());
+	        	
+	        	new Thread(new HandleAPlayer(socket)).start();
+				
+	          }
+	      }
+	      catch(IOException ex) {
+	    	  try {
+					if(socket != null) {
+						socket.close();
+					}
+					if(serverSocket != null) {
+						serverSocket.close();
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+	      } 
+	   }
+	
+	class HandleAPlayer implements Runnable {
+	    private Socket socket; // A connected socket
+	    
+	    
+	    /** Construct a thread */
+	    public HandleAPlayer(Socket socket) {
+	      this.socket = socket;
+	      
+	    }
+
+	    /** Run a thread */
+	    public void run() {
+	      try {
+	       
+	        	ObjectInputStream inputFromClient = new ObjectInputStream(socket.getInputStream());
 		        ObjectOutputStream outputToClient = new ObjectOutputStream(socket.getOutputStream());
 	          
 		        while(true) {
 		        	String returnMessage = null;
 		        	String typeStr = null;
-		        	
 		        	//inputFromClient = new ObjectInputStream(socket.getInputStream());
 
         	        Object object = null;
-        	        
 					try {
 						object = inputFromClient.readObject();
-						//sentArr.clear();
-						sentArr = (ArrayList<Object>)object;
 					} 
 					catch (EOFException e) {
 						e.printStackTrace();
@@ -72,7 +101,7 @@ public class Server extends JFrame implements Runnable {
 						e.printStackTrace();
 						break;
 					}
-					
+					ArrayList<Object> sentArr = (ArrayList<Object>)object;
 					typeStr = (String)sentArr.get(0);
 					ta.append(typeStr + "\n");
 					if(typeStr.equals("userInfo")) {
@@ -87,7 +116,6 @@ public class Server extends JFrame implements Runnable {
 					        	returnMessage = "Username and password saved!";
 						        outputToClient.writeObject(returnMessage);
 						        outputToClient.flush();
-						        
 							}
 							else {
 								returnMessage = "This username has already been chosen!\nPlease choose another username!";
@@ -107,29 +135,35 @@ public class Server extends JFrame implements Runnable {
 								returnMessage = "Welcome back!";
 						        outputToClient.writeObject(returnMessage);
 						        outputToClient.flush();
-						        
 							}
 						}
 					}
 					else if(typeStr.equals("save")) {
-						Board gameToSave = (Board)sentArr.get(1);
-						System.out.println("Saved Game Grid: \n");
-						gameToSave.printGrid();
-						int savedGameID = (int)sentArr.get(2);
+						String tempUsername = (String)sentArr.get(1);
+						String tempPassword = (String)sentArr.get(2);
+						int[][] tempMyGrid = (int[][])sentArr.get(3);
+						int[][] tempOpGrid = (int[][])sentArr.get(4);
+						ArrayList<Ship> tempMyship = (ArrayList<Ship>)sentArr.get(5);
+						ArrayList<Ship> tempOpship = (ArrayList<Ship>)sentArr.get(6);
+						int tempMyHitsLeft = (int)sentArr.get(7);
+						int tempOpHitsLeft = (int)sentArr.get(8);
+						int savedGameID = (int)sentArr.get(9);
+						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
+								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false);
 						String gameStatus = checkGame(gameToSave);
 						if(gameStatus.equals("Game exists")) {
 							int storedGameID = getSavedGameID(gameToSave);
 							if(savedGameID == storedGameID) {
+								gameToSave.printGrid();
+								ta.append("About to update!\n");
 								updateGame(gameToSave);
 								int gameID = getSavedGameID(gameToSave);
-								returnMessage = "Game updated!\n";
+								returnMessage = "Game updated!";
 								ArrayList<Object> retArrList = new ArrayList<>();
 								retArrList.add(gameID);
 								retArrList.add(returnMessage);
 								outputToClient.writeObject(retArrList);
 								outputToClient.flush();
-								sentArr.clear();
-								gameToSave = null;
 							}
 							else {
 								ArrayList<Object> retArrList = new ArrayList<>();
@@ -144,7 +178,7 @@ public class Server extends JFrame implements Runnable {
 						else if(gameStatus.equals("No such game exists")) {
 							saveGame(gameToSave);
 							int gameID = getSavedGameID(gameToSave);
-							returnMessage = "Game saved!\n";
+							returnMessage = "Game saved!";
 							ArrayList<Object> retArrList = new ArrayList<>();
 							retArrList.add(gameID);
 							retArrList.add(returnMessage);
@@ -177,45 +211,42 @@ public class Server extends JFrame implements Runnable {
 				        }
 					}
 					else if(typeStr.equals("delete")) {
-						Board gameToSave = (Board)sentArr.get(1);
-						String gameUsername = gameToSave.getUsername();
-						String gamePassword = gameToSave.getPassword();
-						deleteGame(gameUsername, gamePassword);
+						String tempUsername = (String)sentArr.get(1);
+						String tempPassword = (String)sentArr.get(2);
+						int[][] tempMyGrid = (int[][])sentArr.get(3);
+						int[][] tempOpGrid = (int[][])sentArr.get(4);
+						ArrayList<Ship> tempMyship = (ArrayList<Ship>)sentArr.get(5);
+						ArrayList<Ship> tempOpship = (ArrayList<Ship>)sentArr.get(6);
+						int tempMyHitsLeft = (int)sentArr.get(7);
+						int tempOpHitsLeft = (int)sentArr.get(8);
+						int savedGameID = (int)sentArr.get(9);
+						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
+								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false);
+						deleteGame(tempUsername, tempPassword);
 						saveGame(gameToSave);
 						int gameID = getSavedGameID(gameToSave);
-						returnMessage = "Game saved!\n";
+						returnMessage = "Game saved!";
 						ArrayList<Object> retArrList = new ArrayList<>();
 						retArrList.add(gameID);
 						retArrList.add(returnMessage);
 						outputToClient.writeObject(retArrList);
 						outputToClient.flush();
 					}
+					else if(typeStr.equals("test")) {
+						System.out.println("test");
+						//returnMessage = "Hi!";
+						//outputToClient.writeObject(returnMessage);
+						//outputToClient.flush();
+					}
 			        
 		        }
-		        
-		        try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-	          }
-	        
 	      }
 	      catch(IOException ex) {
-	    	  try {
-					if(socket != null) {
-						socket.close();
-					}
-					if(serverSocket != null) {
-						serverSocket.close();
-					}
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-	      } 
-	   }
+	        ex.printStackTrace();
+	      }
+	    }
+	}
+
 	
 	public static String checkUsername(String username) {
 		PreparedStatement preparedStatement = null;
@@ -362,12 +393,9 @@ public class Server extends JFrame implements Runnable {
 			preparedStatement.execute();
 			preparedStatement.close();
 			connection.close();
-			bos.close();
-			out.close();
 		} catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
-        }
-		
+        } 
 	}
 	
 	public static void updateGame(Board g) {
@@ -388,11 +416,9 @@ public class Server extends JFrame implements Runnable {
 			preparedStatement.setBytes(1, gameBytes);
 			preparedStatement.setString(2, g.getUsername());
 			preparedStatement.setString(3, g.getPassword());
-			preparedStatement.executeUpdate();
+			preparedStatement.execute();
 			preparedStatement.close();
 			connection.close();
-			bos.close();
-			out.close();
 		} catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
         } 
