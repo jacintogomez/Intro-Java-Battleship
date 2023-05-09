@@ -15,6 +15,13 @@ import java.net.Socket;
 
 import javax.swing.*;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+
 public class Player implements ActionListener {
 	String username;
 	private String password;
@@ -302,7 +309,7 @@ public class Player implements ActionListener {
 		    newGame.setVisible(true);    
 		    newGame.setResizable(true);
 		   
-		    saveGameUI();
+		    //saveGameUI();
 		}
 		else if(cmd.equals("Load Existing Game")) {
 			Board loadedGame = loadGame();
@@ -317,11 +324,11 @@ public class Player implements ActionListener {
 				int tempMyhitsleft = loadedGame.getMyhitsleft();
 				int tempOphitsleft = loadedGame.getOphitsleft();
 				newGame = new Board(tempUsername,tempPassword,tempMygrid,tempOpgrid,tempMyships,
-						tempOpships,tempMyhitsleft,tempOphitsleft);
+						tempOpships,tempMyhitsleft,tempOphitsleft, true);
 				newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			    newGame.setVisible(true);    
 			    newGame.setResizable(true);
-				saveGameUI();
+				//saveGameUI();
 			}
 		}
 		else if(cmd.equals("Save Game")) {
