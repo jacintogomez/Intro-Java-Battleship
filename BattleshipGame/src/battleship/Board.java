@@ -1,6 +1,6 @@
 package battleship;
 
-import java.util.Random;
+import java.util.*;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -32,18 +32,19 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	//1=open, 2=ship, 3=miss, 4=hit
 	private static final long serialVersionUID = 1L;
-	private int gamewidth=1000;
-	private int gameheight=700;
-	private int gridwidth=350;
-	private int gridheight=350;
+	private int gamewidth=1500;
+	private int gameheight=600;
+	private int gridwidth=gamewidth/4;
+	private int gridheight=gridwidth;
 	private int cellwidth=gridwidth/10;
 	private int cellheight=gridheight/10;
 	
 	private int mygrid[][]=new int[10][10];
 	private int opgrid[][]=new int[10][10];
-	private int xoffset=(gamewidth/2-gridwidth)/2;
+	private int xoffset=(gamewidth/3-gridwidth)/2;
 	private int yoffset=(gameheight-gridheight)/2;
 	private boolean gameinprogress;
+	private Queue<Coordinate> attack;
 	
 	private JButton fire, btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
 	private JLabel deleteGameLabel;
@@ -57,8 +58,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	private ArrayList<Ship> opships=new ArrayList<Ship>();
 	private ImagePanel leftboard;
 	private ImagePanel rightboard;
-	private String username;
-	private String password;
+	private String username="jacinto";
+	private String password="1234";
 	private int ophitsleft;
 	private int myhitsleft;
 	
@@ -79,8 +80,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		setuserships();
-		//randomizeuserships();
+		//setuserships();
+		randomizeuserships();
 		launchgame();
 	}
 	
@@ -96,13 +97,13 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		setuserships();
-		//randomizeuserships();
+		//setuserships();
+		randomizeuserships();
 		launchgame();
 	}
 	
 	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,
-			ArrayList<Ship> opships,int myhitsleft,int ophitsleft, boolean launchGame) {
+			ArrayList<Ship> opships,int myhitsleft,int ophitsleft,boolean launchGame) {
 		this.username=username;
 		this.password=password;
 		this.mygrid=mygrid;
@@ -111,6 +112,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		this.opships=opships;
 		this.myhitsleft=myhitsleft;
 		this.ophitsleft=ophitsleft;
+		this.attack=attack;
 		if(launchGame == true) {
 			launchgame();
 		}
@@ -154,6 +156,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	public void launchgame() {
 		gameinprogress=true;
+		attack=new LinkedList<Coordinate>();
 		enter=new JTextField(5);
 		enter.addActionListener(new textfieldlistener());
 		fire=new JButton("Fire");
@@ -211,22 +214,22 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	                    	g.setColor(Color.BLUE);
 	                    	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
 	                    	g.setColor(Color.GRAY);
-	                    	if(corner=='l') {
-	                    		g.fillRect((x * width)+xoffset+cellwidth/2+1, (y * height)+yoffset+1, width/2-2, height-2);
-		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-	                    	}
-	                    	if(corner=='r') {
-	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width/2-2, height-2);
-		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-	                    	}
-	                    	if(corner=='t') {
-	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+cellwidth/2+1, width-2, height/2-2);
-		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-	                    	}
-	                    	if(corner=='b') {
-	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height/2-2);
-		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-	                    	}
+							if(corner=='l') {
+								g.fillRect((x * width)+xoffset+cellwidth/2+1, (y * height)+yoffset+1, width/2-1, height-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='r') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width/2-2, height-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='t') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+cellwidth/2+1, width-2, height/2-1);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='b') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height/2-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
 	                    }
 	                }
 	            }
@@ -324,7 +327,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		
 		//rightboard.add(enter,BorderLayout.NORTH);
 		//rightboard.add(fire,BorderLayout.NORTH);
-		messages=new JTextArea(6,0);
+		messages=new JTextArea();
+		messages.setPreferredSize(new Dimension(200, messages.getPreferredSize().height));
 		messages.setEditable(false);
 		messages.setLineWrap(true);
 		scroll=new JScrollPane(messages);
@@ -335,6 +339,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		winner.setEditable(false);
 		leftboard.add(messages,BorderLayout.SOUTH);
 		mainpan.add(leftboard);
+		mainpan.add(messages);
 		mainpan.add(rightboard);
 		this.add(mainpan,BorderLayout.CENTER);
 		rightboard.repaint();
@@ -348,7 +353,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		topPanel.add(connectionPanel, BorderLayout.WEST);
 		topPanel.add(winner,BorderLayout.NORTH);
 		this.add(topPanel, BorderLayout.NORTH);
-		this.add(messages,BorderLayout.SOUTH);
 		this.add(topPanel,BorderLayout.NORTH);
 	}
 	
@@ -394,17 +398,15 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			}
 			checkifgameover();
 		} //I hit a ship
-		//calerts.setText(player.username+" guesses "+choice+" - "+hitormiss);
-		//messages.insert(player.username+" guesses "+choice+" - "+hitormiss+'\n',0);
-		//timedelay(0.25);
+		messages.insert(this.username+" guesses "+choice+" - "+hitormiss+'\n',0);
 		System.out.println("Myturn grid: \n");
 		printGrid();
 		if(aftermessage!="") {
 			timedelay(0.25);
-			//messages.insert(aftermessage,0);
+			messages.insert(aftermessage,0);
 		}
 	}
-			
+
 	public void computerturn() {
 		timedelay(1);
 		int x;
@@ -412,11 +414,16 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		String hitormiss="";
 		String computerguess="";
 		String aftermessage="";
-		do {
-			x=pickspot(10);
-			y=pickspot(10);
-			System.out.println("result is "+mygrid[x][y]+", picking new target");
-		}while(mygrid[x][y]!=1&&mygrid[x][y]!=2);
+		if(!attack.isEmpty()) {
+			Coordinate suggestion=attack.remove();
+			x=suggestion.rawcolumn;
+			y=suggestion.rawrow;
+		}else {
+			do {
+				x=pickspot(10);
+				y=pickspot(10);
+			}while(mygrid[x][y]!=1&&mygrid[x][y]!=2);
+		}
 		computerguess+=convert(x)+y;
 		if(mygrid[x][y]==1) {
 			hitormiss="Miss";
@@ -426,23 +433,33 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			hitormiss="Hit";
 			mygrid[x][y]=4;
 			myhitsleft--;
+			for(int z=1;z<=4;z++) {
+				addsuspiciouslocations(x,y,z);
+			}
 			for(Ship s:myships) {
 				s.checkifstruck(new Coordinate(x,y));
 			}
 			for(Ship s:myships) {
 				if(s.active&&(s.holes==s.struck)) {
 					s.active=false;
-					aftermessage="Computer sunk "+ username+"'s "+s.name+'\n';
+					aftermessage="Computer sunk "+this.username+"'s "+s.name+'\n';
+					attack.clear();
 				}
 			}
 			checkifgameover();
 		} //my ship has been hit
-		//messages.insert("Computer guesses "+computerguess+" - "+hitormiss+'\n',0);
-		//timedelay(0.25);
+		messages.insert("Computer guesses "+computerguess+" - "+hitormiss+'\n',0);
 		if(aftermessage!="") {
 			timedelay(0.25);
-			//messages.insert(aftermessage,0);
+			messages.insert(aftermessage,0);
 		}
+	}
+
+	public void addsuspiciouslocations(int x,int y,int c) {
+		if(c==1&&isvalid(x,y-1)&&mygrid[x][y-1]!=3&&mygrid[x][y-1]!=4) {attack.add(new Coordinate(x,y-1));};
+		if(c==2&&isvalid(x,y+1)&&mygrid[x][y+1]!=3&&mygrid[x][y+1]!=4) {attack.add(new Coordinate(x,y+1));};
+		if(c==3&&isvalid(x+1,y)&&mygrid[x+1][y]!=3&&mygrid[x+1][y]!=4) {attack.add(new Coordinate(x+1,y));};
+		if(c==4&&isvalid(x-1,y)&&mygrid[x-1][y]!=3&&mygrid[x-1][y]!=4) {attack.add(new Coordinate(x-1,y));};
 	}
 		
 	public void createships() {
@@ -572,8 +589,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	public void setuserships() {
 		boolean initialized=false;
+		Initpanel frame;
 		for(Ship s:myships) {
-			Initpanel frame = new Initpanel("Set your "+s.name+" ("+s.holes+" spaces long)");
+			frame = new Initpanel("Set your "+s.name+" ("+s.holes+" spaces long)");
 	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	        frame.setVisible(true); 
 	        int counter=0;
@@ -584,14 +602,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	        do {
 	        	counter++;
 	        	if(counter>1) {frame.setwarning("invalid/overlapping location; pick again");}
-	        	synchronized(this) {
-	        		while(!initialized) {
-	        	
+	        	while(!initialized) {
+	        		timedelay(0.5);
 		        	System.out.println("uninitialized");
 		        	if(frame.direction!=null&&frame.number!=-1&&frame.letter!='a') {
 		        		initialized=true;
 		        	}
-		        }
 	        	}
 	        	System.out.println("initialized now");
 	        	initialized=false;

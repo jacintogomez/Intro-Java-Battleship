@@ -50,7 +50,7 @@ public class Initpanel extends JFrame implements Serializable {
 		display=new JLabel(shipname);
 		warning=new JLabel("");
 		warning.setForeground(Color.RED);
-		JLabel instruction=new JLabel("this will");
+		JLabel instruction=new JLabel("");
 		JPanel toppanel=new JPanel();
 		JPanel instructionpanel=new JPanel();
 		JPanel bottompanel=new JPanel();
