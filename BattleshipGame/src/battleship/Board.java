@@ -97,7 +97,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		//setuserships();
+		setuserships();
 		randomizeuserships();
 		launchgame();
 		try {
@@ -628,20 +628,23 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	        frame.setVisible(true); 
 	        int counter=0;
-	        int col;
-			int row;
-			String dir;
-			int len;
-	        do {
+	        int col = 0;
+			int row = 0;
+			String dir = null;
+			int len = 0;
+			/*
+			do {
 	        	counter++;
-	        	if(counter>1) {frame.setwarning("invalid/overlapping location; pick again");}
+	        	if(counter>1) {
+	        		frame.setwarning("invalid/overlapping location; pick again");
+	        	}
 	        	while(!initialized) {
-	        		timedelay(0.5);
+		    		timedelay(0.5);
 		        	System.out.println("uninitialized");
 		        	if(frame.direction!=null&&frame.number!=-1&&frame.letter!='a') {
 		        		initialized=true;
 		        	}
-	        	}
+				}
 	        	System.out.println("initialized now");
 	        	initialized=false;
 	        	col=frame.number;
@@ -649,8 +652,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				dir=frame.direction;
 				len=s.getHoles();
 				System.out.println("coordinate for "+s.name+" is "+row+":"+col+" "+dir);
-	        }while(conflicts(col,row,dir,len,true));
-	        System.out.println("already out");
+	        }while(conflicts(col,row,dir,len,true));*/
+	        //System.out.println("already out");
 	        initialized=false;
 			if(dir=="up") {
 				while(len>0&&row>=0) {
@@ -692,9 +695,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				s.coords.get(0).special='l';
 				s.coords.get(s.holes-1).special='r';
 			}
-			frame.dispose();
+			//frame.dispose();
+			
+			}
+			
+			
 		}
-	}
 	
 	public void setopponentships() {
 		for(Ship s:opships) {
