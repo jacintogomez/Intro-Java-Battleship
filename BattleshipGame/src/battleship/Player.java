@@ -70,6 +70,40 @@ public class Player implements ActionListener {
 		return this.password;
 	}
 	
+	private void userLoginUI() {
+		frameEnterInfo = new JFrame();
+		frameEnterInfo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameEnterInfo.setSize(400,150);
+		frameEnterInfo.setLayout(new BorderLayout());
+		JLabel usrLabel = new JLabel("Register as new user or login as existing user", SwingConstants.CENTER);
+		frameEnterInfo.add(usrLabel, BorderLayout.NORTH);
+		
+		usernameLabel = new JLabel("Username: ");
+		passwordLabel = new JLabel("Password: ");
+		
+		txtUser = new JTextField("",15);//To adjust width
+		txtPword = new JTextField();
+		
+		JButton btnRegisterNewUser = new JButton("Register as new user");
+		btnRegisterNewUser.addActionListener(this);
+		JButton btnLoginExistingUser = new JButton("Login as existing user");
+		btnLoginExistingUser.addActionListener(this);
+		
+		JPanel pnlInput = new JPanel(new GridLayout(3,3));
+		
+		pnlInput.add(usernameLabel);
+		pnlInput.add(txtUser);
+		
+		pnlInput.add(passwordLabel);
+		pnlInput.add(txtPword);
+		
+		pnlInput.add(btnRegisterNewUser);
+		pnlInput.add(btnLoginExistingUser);
+		frameEnterInfo.add(pnlInput, BorderLayout.CENTER);
+		frameEnterInfo.setVisible(true);
+		
+	}
+	
 	private void connectionUI() {
 		frameConnection = new JFrame("Connection Panel");
 		frameConnection.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -92,7 +126,7 @@ public class Player implements ActionListener {
 		frameConnection.setSize(400, 200);
 		frameConnection.setVisible(true);
 	}
-	
+	/*
 	private void userTypeUI()
 	{
 		frameUserType = new JFrame();
@@ -121,7 +155,7 @@ public class Player implements ActionListener {
 		
 		frameUserType.setVisible(true);
 	}
-	
+	*/
 	private void enterInfoUI() {
 		frameEnterInfo = new JFrame();
 		frameEnterInfo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -255,12 +289,13 @@ public class Player implements ActionListener {
 	public void actionPerformed(ActionEvent evt) {		
 		String cmd = evt.getActionCommand();
 		
-		if(cmd.equals("New User"))
-		{
-			newUser();
-		}else if(cmd.equals("Existing User"))
-		{
-			existingUser();
+		if(cmd.equals("Register as new user")) {
+			this.isNew = true;
+			userPwordEnter();
+		}
+		else if(cmd.equals("Login as existing user")) {
+			this.isNew = false;
+			userPwordEnter();
 		}
 		else if(cmd.equals("Enter Username and Password")) {
 			//System.out.println("Username and Pword!");
@@ -278,7 +313,7 @@ public class Player implements ActionListener {
 				      ta.append(ex.toString() + '\n');
 				    }
 				ta.append("connected\n");
-				userTypeUI();
+				userLoginUI();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 				ta.append("connection Failure\n");
@@ -344,7 +379,7 @@ public class Player implements ActionListener {
 			frameDeleteGame.dispose();
 		}
 	}
-	
+/*	
 	public void newUser() {
 		this.isNew = true;
 		System.out.println(this.isNew);
@@ -356,7 +391,7 @@ public class Player implements ActionListener {
 		System.out.println(this.isNew);
 		enterInfoUI();
 	}
-	
+	*/
 	public void userPwordEnter() {
 		String username = txtUser.getText().trim();
 		String password = txtPword.getText().trim();
@@ -388,7 +423,7 @@ public class Player implements ActionListener {
 	        if(messageForPlayer.equals("Welcome back!") || messageForPlayer.equals("Username and password saved!")) {
 	        	this.username = username;
 	        	this.password = password;
-	        	frameUserType.dispose();
+	        	//frameUserType.dispose();
 	        	frameEnterInfo.dispose();
 	        	newOrLoadGameUI();
 	        }
