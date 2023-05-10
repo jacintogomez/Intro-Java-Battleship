@@ -43,7 +43,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	private int opgrid[][]=new int[10][10];
 	private int xoffset=(gamewidth/3-gridwidth)/2;
 	private int yoffset=(gameheight-gridheight)/2;
-	private boolean gameinprogress;
+	private boolean gameinprogress, playerWon = false, computerWon = false;
 	private Queue<Coordinate> attack;
 	
 	private JButton fire, btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
@@ -100,6 +100,21 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		//setuserships();
 		randomizeuserships();
 		launchgame();
+		try {
+			socket = new Socket("localhost", 8000);
+			try {
+		    	  toServer = new ObjectOutputStream(socket.getOutputStream()); 
+			      fromServer = new ObjectInputStream(socket.getInputStream());
+				      
+			    }
+			    catch (IOException ex) {
+			      messages.append(ex.toString() + '\n');
+			    }
+			messages.append("connected\n");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			messages.append("connection Failure\n");
+		}
 	}
 	
 	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,
@@ -115,6 +130,21 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		this.attack=attack;
 		if(launchGame == true) {
 			launchgame();
+		}
+		try {
+			socket = new Socket("localhost", 8000);
+			try {
+		    	  toServer = new ObjectOutputStream(socket.getOutputStream()); 
+			      fromServer = new ObjectInputStream(socket.getInputStream());
+				      
+			    }
+			    catch (IOException ex) {
+			      messages.append(ex.toString() + '\n');
+			    }
+			messages.append("connected\n");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			messages.append("connection Failure\n");
 		}
 	}
 	
@@ -180,9 +210,11 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			myturn();
 			leftboard.repaint();
 	    	rightboard.repaint();
-	    	computerturn();
-	    	leftboard.repaint();
-	    	rightboard.repaint();
+	    	if(gameinprogress == true) {
+		    	computerturn();
+		    	leftboard.repaint();
+		    	rightboard.repaint();
+	    	}
 	    	choice=null;
 	    }
 	}
@@ -404,7 +436,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		} //I hit a ship
 		messages.insert(this.username+" guesses "+choice+" - "+hitormiss+'\n',0);
 		System.out.println("Myturn grid: \n");
-		printGrid();
+		//printGrid();
 		if(aftermessage!="") {
 			timedelay(0.25);
 			messages.insert(aftermessage,0);
@@ -833,9 +865,13 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		}
 		if(myhitsleft==0) {
 			winner.append("Computer Wins!");
+			computerWon = true;
+			updateWinLoss();
 			System.out.println("Computer Wins!");
 		}else {
 			winner.append(username+" Wins!");
+			playerWon = true;
+			updateWinLoss();
 			System.out.println(username+" Wins!");
 		}
 		gameinprogress=false;
@@ -853,7 +889,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public char isthisacornero(int x,int y) {
 		Coordinate c=new Coordinate(x,y);
 		for(Ship s:opships) {
-			System.out.println(s.coords.get(0).special);
+			//System.out.println(s.coords.get(0).special);
 			if(s.coords.get(0).equals(c)) {return s.coords.get(0).special;}
 			if(s.coords.get(s.holes-1).equals(c)) {return s.coords.get(s.holes-1).special;}
 		}
@@ -876,7 +912,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		String messageType = "save";
 		//this.setGridCell(5, 5, setNum);
 		//setNum++;
-		this.printGrid();
+		//this.printGrid();
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
 		messageArray.add(this.username);
@@ -924,7 +960,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		String messageType = "update";
 		//this.setGridCell(5, 5, setNum);
 		//setNum++;
-		this.printGrid();
+		//this.printGrid();
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
 		messageArray.add(this.username);
@@ -952,6 +988,34 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			
 			this.savedGameID = gameInt;
 			messages.append(gameString.toString());
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void updateWinLoss() {
+		String messageType = "updateWinLoss";
+		//this.setGridCell(5, 5, setNum);
+		//setNum++;
+		//this.printGrid();
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		messageArray.add(this.username);
+		messageArray.add(this.password);
+		messageArray.add(this.playerWon);
+		try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
+
+	        Object object = null;
+			object = fromServer.readObject();
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			
+			String gameString = (String)retArr.get(0);
+			messages.append(gameString + "\n");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1035,7 +1099,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    game.setVisible(true);    
 	    game.setResizable(true);
-	    game.printGrid();
+	    //game.printGrid();
 	}
 
 }

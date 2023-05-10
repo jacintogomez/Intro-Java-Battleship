@@ -237,11 +237,16 @@ public class Server extends JFrame implements Runnable {
 						outputToClient.writeObject(retArrList);
 						outputToClient.flush();
 					}
-					else if(typeStr.equals("test")) {
-						System.out.println("test");
-						//returnMessage = "Hi!";
-						//outputToClient.writeObject(returnMessage);
-						//outputToClient.flush();
+					else if(typeStr.equals("updateWinLoss")) {
+						String tempUsername = (String)sentArr.get(1);
+						String tempPassword = (String)sentArr.get(2);
+						boolean tempPlayerWon = (boolean)sentArr.get(3);
+						updateUser(tempUsername, tempPassword, tempPlayerWon);
+						returnMessage = "User Win/Loss Updated!";
+						ArrayList<Object> retArrList = new ArrayList<>();
+						retArrList.add(returnMessage);
+						outputToClient.writeObject(retArrList);
+						outputToClient.flush();
 					}
 					else if(typeStr.equals("update")) {
 						String tempUsername = (String)sentArr.get(1);
@@ -285,7 +290,7 @@ public class Server extends JFrame implements Runnable {
 		String retString = null;
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
-			String queryString = "SELECT username FROM usernamepassword WHERE username = ?";
+			String queryString = "SELECT username FROM users WHERE username = ?";
 			preparedStatement = connection.prepareStatement(queryString);
 			preparedStatement.setString(1, username);
 			rs = preparedStatement.executeQuery();
@@ -312,7 +317,7 @@ public class Server extends JFrame implements Runnable {
 		String retString = null;
 		try {
 			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
-			String queryString = "SELECT username, password FROM usernamepassword WHERE username = ? and password = ?";
+			String queryString = "SELECT username, password FROM users WHERE username = ? and password = ?";
 			preparedStatement = connection.prepareStatement(queryString);
 			preparedStatement.setString(1, username);
 			preparedStatement.setString(2, password);
@@ -345,10 +350,12 @@ public class Server extends JFrame implements Runnable {
 			out = new ObjectOutputStream(bos);
 			out.writeObject(username);
 			out.flush();
-			String insertString = "INSERT INTO usernamepassword(username, password) VALUES (?,?)";
+			String insertString = "INSERT INTO users(username, password, numberofwins, numberoflosses) VALUES (?,?,?,?)";
 			preparedStatement = connection.prepareStatement(insertString);
 			preparedStatement.setString(1, username);
 			preparedStatement.setString(2, password);
+			preparedStatement.setInt(3, 0);
+			preparedStatement.setInt(4, 0);
 			preparedStatement.execute();
 			preparedStatement.close();
 			connection.close();
@@ -378,29 +385,6 @@ public class Server extends JFrame implements Runnable {
 		
 	}
 
-	public static void saveUsername(String username) {
-		PreparedStatement preparedStatement;
-		Connection connection = null;
-		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutputStream out = null;
-		
-		try {
-			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
-			out = new ObjectOutputStream(bos);
-			out.writeObject(username);
-			out.flush();
-			String insertString = "INSERT INTO users(username) VALUES (?)";
-			preparedStatement = connection.prepareStatement(insertString);
-			preparedStatement.setString(1, username);
-			preparedStatement.execute();
-			preparedStatement.close();
-			connection.close();
-		} catch (IOException | SQLException ex) {
-            System.out.println(ex.getMessage());
-        } 
-	}
-
 	public static void saveGame(Board g) {
 		PreparedStatement preparedStatement;
 		Connection connection = null;
@@ -424,6 +408,30 @@ public class Server extends JFrame implements Runnable {
 			preparedStatement.close();
 			connection.close();
 		} catch (IOException | SQLException ex) {
+            System.out.println(ex.getMessage());
+        } 
+	}
+	
+	public static void updateUser(String username, String password, boolean playerWon) {
+		PreparedStatement preparedStatement;
+		Connection connection = null;
+		
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
+			String insertString = null;
+			if(playerWon == true) {
+				insertString = "UPDATE users SET numberofwins = numberofwins + 1 WHERE username = ? AND password = ?";
+			}
+			else {
+				insertString = "UPDATE users SET numberoflosses = numberoflosses + 1 WHERE username = ? AND password = ?";
+			}
+			preparedStatement = connection.prepareStatement(insertString);
+			preparedStatement.setString(1, username);
+			preparedStatement.setString(2, password);
+			preparedStatement.execute();
+			preparedStatement.close();
+			connection.close();
+		} catch (SQLException ex) {
             System.out.println(ex.getMessage());
         } 
 	}
