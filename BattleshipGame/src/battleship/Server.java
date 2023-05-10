@@ -142,23 +142,25 @@ public class Server extends JFrame implements Runnable {
 						}
 					}
 					else if(typeStr.equals("save")) {
-						String tempUsername = (String)sentArr.get(1);
-						String tempPassword = (String)sentArr.get(2);
-						int[][] tempMyGrid = (int[][])sentArr.get(3);
-						int[][] tempOpGrid = (int[][])sentArr.get(4);
-						ArrayList<Ship> tempMyship = (ArrayList<Ship>)sentArr.get(5);
-						ArrayList<Ship> tempOpship = (ArrayList<Ship>)sentArr.get(6);
-						int tempMyHitsLeft = (int)sentArr.get(7);
-						int tempOpHitsLeft = (int)sentArr.get(8);
-						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
-						int savedGameID = (int)sentArr.get(10);
+						boolean tempLoad = (boolean)sentArr.get(1);
+						String tempUsername = (String)sentArr.get(2);
+						String tempPassword = (String)sentArr.get(3);
+						int[][] tempMyGrid = (int[][])sentArr.get(4);
+						int[][] tempOpGrid = (int[][])sentArr.get(5);
+						ArrayList<Ship> tempMyship = (ArrayList<Ship>)sentArr.get(6);
+						ArrayList<Ship> tempOpship = (ArrayList<Ship>)sentArr.get(7);
+						int tempMyHitsLeft = (int)sentArr.get(8);
+						int tempOpHitsLeft = (int)sentArr.get(9);
+						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(10);
+						int savedGameID = (int)sentArr.get(11);
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
 						String gameStatus = checkGame(gameToSave);
+						System.out.println("Save Flag: " + saveFlag + " tempLoad: " + tempLoad + "\n");
 						if(gameStatus.equals("Game exists")) {
-							if(saveFlag == true || (saveFlag == false && loadFlag == true)) {
+							if(saveFlag == true || (saveFlag == false && tempLoad == true)) {
 								ArrayList<Object> retArrList = new ArrayList<>();
-								returnMessage = "An earlier version of this game is saved.\n Updating game to current state.\n";
+								returnMessage = "An earlier version of this game is saved. Updating game to current state.";
 								int gameID = 0;
 								retArrList.add(gameID);
 								retArrList.add(returnMessage);
@@ -166,7 +168,7 @@ public class Server extends JFrame implements Runnable {
 								outputToClient.flush();
 							}
 							
-							else if(saveFlag == false && loadFlag == false){
+							else if(saveFlag == false && tempLoad == false){
 								ArrayList<Object> retArrList = new ArrayList<>();
 								returnMessage = "You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n";
 								int gameID = 0;
@@ -213,7 +215,7 @@ public class Server extends JFrame implements Runnable {
 				        	outputToClient.flush();
 				        }
 					}
-					else if(typeStr.equals("delete")) {
+					else if(typeStr.equals("deleteandsave")) {
 						String tempUsername = (String)sentArr.get(1);
 						String tempPassword = (String)sentArr.get(2);
 						int[][] tempMyGrid = (int[][])sentArr.get(3);
@@ -231,6 +233,32 @@ public class Server extends JFrame implements Runnable {
 						saveFlag = true;
 						int gameID = getSavedGameID(gameToSave);
 						returnMessage = "Game saved!";
+						ArrayList<Object> retArrList = new ArrayList<>();
+						retArrList.add(gameID);
+						retArrList.add(returnMessage);
+						outputToClient.writeObject(retArrList);
+						outputToClient.flush();
+					}
+					else if(typeStr.equals("delete")) {
+						String tempUsername = (String)sentArr.get(1);
+						String tempPassword = (String)sentArr.get(2);
+						int[][] tempMyGrid = (int[][])sentArr.get(3);
+						int[][] tempOpGrid = (int[][])sentArr.get(4);
+						ArrayList<Ship> tempMyship = (ArrayList<Ship>)sentArr.get(5);
+						ArrayList<Ship> tempOpship = (ArrayList<Ship>)sentArr.get(6);
+						int tempMyHitsLeft = (int)sentArr.get(7);
+						int tempOpHitsLeft = (int)sentArr.get(8);
+						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
+						int savedGameID = (int)sentArr.get(10);
+						
+						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
+								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
+						String gameStatus = checkGame(gameToSave);
+						if(gameStatus.equals("Game exists")) {
+							deleteGame(tempUsername, tempPassword);
+						}
+						int gameID = 0;
+						returnMessage = "Game deleted!";
 						ArrayList<Object> retArrList = new ArrayList<>();
 						retArrList.add(gameID);
 						retArrList.add(returnMessage);

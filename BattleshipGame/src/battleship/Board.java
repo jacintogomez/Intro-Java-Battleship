@@ -43,7 +43,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	private int opgrid[][]=new int[10][10];
 	private int xoffset=(gamewidth/3-gridwidth)/2;
 	private int yoffset=(gameheight-gridheight)/2;
-	private boolean gameinprogress, playerWon = false, computerWon = false;
+	private boolean gameinprogress, playerWon = false, computerWon = false, loadedGame = false;
 	private Queue<Coordinate> attack;
 	
 	private JButton fire, btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
@@ -119,6 +119,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,
 			ArrayList<Ship> opships,int myhitsleft,int ophitsleft,boolean launchGame, Queue<Coordinate> attack) {
+		this.loadedGame = true;
 		this.username=username;
 		this.password=password;
 		this.mygrid=mygrid;
@@ -130,22 +131,23 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		this.attack=attack;
 		if(launchGame == true) {
 			launchgame();
-		}
-		try {
-			socket = new Socket("localhost", 8000);
 			try {
-		    	  toServer = new ObjectOutputStream(socket.getOutputStream()); 
-			      fromServer = new ObjectInputStream(socket.getInputStream());
-				      
-			    }
-			    catch (IOException ex) {
-			      messages.append(ex.toString() + '\n');
-			    }
-			messages.append("connected\n");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			messages.append("connection Failure\n");
+				socket = new Socket("localhost", 8000);
+				try {
+			    	  toServer = new ObjectOutputStream(socket.getOutputStream()); 
+				      fromServer = new ObjectInputStream(socket.getInputStream());
+					      
+				    }
+				    catch (IOException ex) {
+				      messages.append(ex.toString() + '\n');
+				    }
+				messages.append("connected\n");
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				messages.append("connection Failure\n");
+			}
 		}
+		
 	}
 	
 	public int[][] getMyGrid(){
@@ -435,7 +437,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			checkifgameover();
 		} //I hit a ship
 		messages.insert(this.username+" guesses "+choice+" - "+hitormiss+'\n',0);
-		System.out.println("Myturn grid: \n");
+		//System.out.println("Myturn grid: \n");
 		//printGrid();
 		if(aftermessage!="") {
 			timedelay(0.25);
@@ -786,7 +788,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public void timedelay(double time) {
 		double start=System.currentTimeMillis();
 		while(System.currentTimeMillis()<start+time*1000);
-		System.out.println("wait "+time+" second(s)");
+		//System.out.println("wait "+time+" second(s)");
 	}
 	
 	public class textfieldlistener implements ActionListener{
@@ -867,12 +869,14 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			winner.append("Computer Wins!");
 			computerWon = true;
 			updateWinLoss();
-			System.out.println("Computer Wins!");
+			deleteGame();
+			//System.out.println("Computer Wins!");
 		}else {
 			winner.append(username+" Wins!");
 			playerWon = true;
 			updateWinLoss();
-			System.out.println(username+" Wins!");
+			deleteGame();
+			//System.out.println(username+" Wins!");
 		}
 		gameinprogress=false;
 	}
@@ -913,8 +917,10 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		//this.setGridCell(5, 5, setNum);
 		//setNum++;
 		//this.printGrid();
+		System.out.println("save");
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
+		messageArray.add(this.loadedGame);
 		messageArray.add(this.username);
 		messageArray.add(this.password);
 		messageArray.add(this.mygrid);
@@ -936,16 +942,16 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			int gameInt = (int)retArr.get(0);
 			String gameString = (String)retArr.get(1);
 			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
-				messages.append(gameString.toString());
+				messages.insert(gameString.toString(),0);
 				deleteGameUI();
 			}
-			else if(gameString.equals("An earlier version of this game is saved.\n Updating game to current state.\n")) {
-				messages.append(gameString.toString());
+			else if(gameString.equals("An earlier version of this game is saved. Updating game to current state.")) {
+				messages.insert(gameString.toString() + "\n",0);
 				updateGame();
 			}
 			else {
 				this.savedGameID = gameInt;
-				messages.append(gameString.toString() + "\n");
+				messages.insert(gameString.toString() + "\n",0);
 			}
 
 		} catch (IOException e) {
@@ -987,7 +993,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			String gameString = (String)retArr.get(1);
 			
 			this.savedGameID = gameInt;
-			messages.append(gameString.toString());
+			messages.insert(gameString.toString() + "\n",0);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1057,7 +1063,13 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 	
 	public void deleteGame() {
-		String messageType = "delete";
+		String messageType = null;
+		if(computerWon == true || playerWon == true) {
+			messageType = "delete";
+		}
+		else {
+			messageType = "deleteandsave";
+		}
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
 		messageArray.add(this.username);
@@ -1072,6 +1084,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		messageArray.add(this.savedGameID);
 		
     	try {
+    		if(messageType.equals("delete")) {
+    			toServer.reset();
+    		}
 			toServer.writeObject(messageArray);
 			toServer.flush();
 
