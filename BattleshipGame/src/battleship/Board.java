@@ -80,8 +80,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		//setuserships();
-		randomizeuserships();
+		setuserships();
+		//randomizeuserships();
 		launchgame();
 	}
 	
@@ -942,7 +942,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			int gameInt = (int)retArr.get(0);
 			String gameString = (String)retArr.get(1);
 			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
-				messages.insert(gameString.toString(),0);
+				//messages.insert(gameString.toString(),0);
 				deleteGameUI();
 			}
 			else if(gameString.equals("An earlier version of this game is saved. Updating game to current state.")) {
@@ -1034,13 +1034,16 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	{
 		frameDeleteGame = new JFrame();
 		frameDeleteGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameDeleteGame.setSize(1600,100);
+		frameDeleteGame.setSize(600,100);
 		//Layout of Main Window
 		frameDeleteGame.setLayout(new BorderLayout());
 		
-		deleteGameLabel = new JLabel("You already have a different game saved.\nUsers are permitted to have at most 1 game saved at a time.\nDo you want to delete this existing game and save your current game in its place?");
-		JPanel pnlLabel = new JPanel();
-		pnlLabel.add(deleteGameLabel);
+		JLabel deleteGameLabelOne = new JLabel("<html>You already have a different game saved.</html>",SwingConstants.CENTER);
+		JLabel deleteGameLabelTwo = new JLabel("<html>Do you want to delete this existing game and save your current game in its place?</html>",SwingConstants.CENTER);
+		JPanel pnlLabel = new JPanel(new GridLayout(2,1));
+		pnlLabel.add(deleteGameLabelOne);
+		pnlLabel.add(deleteGameLabelTwo);
+		
 		btnDeleteGame = new JButton("Yes, delete previous saved game");
 		btnDeleteGame.addActionListener(this);
 		
@@ -1098,7 +1101,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			String gameString = (String)retArr.get(1);
 			
 			this.savedGameID = gameInt;
-			messages.append(gameString.toString());
+			messages.insert(gameString.toString() + "\n",0);
 			
 			
 		} catch (IOException e) {

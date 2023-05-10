@@ -32,7 +32,7 @@ public class Player implements ActionListener {
 	private int Id;
 	int numberofwins = 0, numberoflosses = 0;
 	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame;
-	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel, deleteGameLabel;
+	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel, deleteGameLabelOne, deleteGameLabelTwo;
 	JTextField txtUser,txtPword;
 	JFrame frameNewLoad, frameEnterInfo, frameConnection, frameUserType, frameSaveGame, frameDeleteGame;
 	JTextField textField = null;
@@ -108,6 +108,7 @@ public class Player implements ActionListener {
 		frameConnection = new JFrame("Connection Panel");
 		frameConnection.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ta = new JTextArea(30,30);
+		ta.setWrapStyleWord(true);
 		frameConnection.setLayout(new BorderLayout());
 	
 		JPanel topPanel = new JPanel(new GridLayout(2,1));
@@ -120,8 +121,9 @@ public class Player implements ActionListener {
 		controlPanel.add(closeButton);
 		topPanel.add(controlPanel);
 		frameConnection.add(topPanel, BorderLayout.NORTH);
-	
-		frameConnection.add(ta, BorderLayout.CENTER);
+		JScrollPane sp = new JScrollPane(ta);
+		frameConnection.add(sp, BorderLayout.CENTER);
+		//frameConnection.add(ta, BorderLayout.CENTER);
 		
 		frameConnection.setSize(400, 200);
 		frameConnection.setVisible(true);
@@ -248,13 +250,15 @@ public class Player implements ActionListener {
 	{
 		frameDeleteGame = new JFrame();
 		frameDeleteGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameDeleteGame.setSize(1600,100);
+		frameDeleteGame.setSize(600,100);
 		//Layout of Main Window
 		frameDeleteGame.setLayout(new BorderLayout());
 		
-		deleteGameLabel = new JLabel("You already have a different game saved.\nUsers are permitted to have at most 1 game saved at a time.\nDo you want to delete this existing game and save your current game in its place?");
-		JPanel pnlLabel = new JPanel();
-		pnlLabel.add(deleteGameLabel);
+		deleteGameLabelOne = new JLabel("<html>You already have a different game saved.</html>",SwingConstants.CENTER);
+		deleteGameLabelTwo = new JLabel("<html>Do you want to delete this existing game and save your current game in its place?</html>",SwingConstants.CENTER);
+		JPanel pnlLabel = new JPanel(new GridLayout(2,1));
+		pnlLabel.add(deleteGameLabelOne);
+		pnlLabel.add(deleteGameLabelTwo);
 		btnDeleteGame = new JButton("Yes, delete previous saved game");
 		btnDeleteGame.addActionListener(this);
 		
