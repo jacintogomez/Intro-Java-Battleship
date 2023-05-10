@@ -48,7 +48,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	private JButton fire, btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
 	private JLabel deleteGameLabel;
-	private JFrame frameDeleteGame;
+	private JFrame frameDeleteGame, frameEndGame;
 	private JTextField enter;
 	private String choice;
 	private JTextArea messages, winner;
@@ -350,18 +350,14 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		mainpan.setLayout(new GridLayout(1,2));
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BorderLayout());
-		JPanel connectionPanel = new JPanel();
-		JPanel savePanel = new JPanel();
+		JPanel savePanel = new JPanel(new GridLayout(1,2));
 		btnSaveGame = new JButton("Save Game");
-		savePanel.add(btnSaveGame);
 		btnSaveGame.addActionListener(this);
-		connectionPanel.setLayout(new GridLayout(1,2));
-		btnOpenConnection = new JButton("Open Connection");
-		btnCloseConnection = new JButton("Close Connection");
-		btnOpenConnection.addActionListener(this);
-		btnCloseConnection.addActionListener(this);
-		connectionPanel.add(btnOpenConnection);
-		connectionPanel.add(btnCloseConnection);
+		JButton btnExitGame = new JButton("Exit game");
+		btnExitGame.addActionListener(this);
+		savePanel.add(btnExitGame);
+		savePanel.add(btnSaveGame);
+		
 		
 		//rightboard.add(enter,BorderLayout.NORTH);
 		//rightboard.add(fire,BorderLayout.NORTH);
@@ -387,8 +383,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		enterPanel.add(enter);
 		enterPanel.add(fire);
 		topPanel.add(enterPanel,BorderLayout.EAST);
-		topPanel.add(savePanel, BorderLayout.CENTER);
-		topPanel.add(connectionPanel, BorderLayout.WEST);
+		topPanel.add(savePanel, BorderLayout.WEST);
 		topPanel.add(winner,BorderLayout.NORTH);
 		this.add(topPanel, BorderLayout.NORTH);
 		this.add(topPanel,BorderLayout.NORTH);
@@ -858,6 +853,26 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		else if(cmd.equals("No, continue current game")) {
 			frameDeleteGame.dispose();
 		}
+		else if(cmd.equals("Exit game")) {
+			try { 
+				if(socket != null) {
+					socket.close();
+				}
+				if(toServer != null) {
+					toServer.close();
+				}
+				if(fromServer != null) {
+					fromServer.close();
+				}
+
+			} catch (Exception e1) {
+				System.err.println("error"); 
+			}
+			if(playerWon == true || computerWon == true) {
+				frameEndGame.dispose();
+			}
+			this.dispose();
+		}
 	}
 	
 	public void checkifgameover() {
@@ -870,12 +885,14 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			computerWon = true;
 			updateWinLoss();
 			deleteGame();
+			endGameUI();
 			//System.out.println("Computer Wins!");
 		}else {
 			winner.append(username+" Wins!");
 			playerWon = true;
 			updateWinLoss();
 			deleteGame();
+			endGameUI();
 			//System.out.println(username+" Wins!");
 		}
 		gameinprogress=false;
@@ -1028,6 +1045,30 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void endGameUI() {
+		frameEndGame = new JFrame();
+		frameEndGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameEndGame.setSize(400,100);
+		frameEndGame.setLayout(new BorderLayout());
+		JLabel endGameLabel = null;
+		if(playerWon == true) {
+			endGameLabel = new JLabel("Congratulations!", SwingConstants.CENTER);
+		}
+		else {
+			endGameLabel = new JLabel("Sorry! Better luck next time!", SwingConstants.CENTER);
+		}
+		JPanel topPanel = new JPanel();
+		topPanel.add(endGameLabel);
+		JButton btnExitGame = new JButton("Exit game");
+		btnExitGame.addActionListener(this);
+		JPanel bottomPanel = new JPanel(new GridLayout(1,1));
+		bottomPanel.add(btnExitGame);
+		
+		frameEndGame.add(topPanel, BorderLayout.NORTH);
+		frameEndGame.add(bottomPanel,BorderLayout.CENTER);
+		frameEndGame.setVisible(true);
 	}
 	
 	private void deleteGameUI()
