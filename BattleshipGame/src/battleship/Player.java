@@ -30,7 +30,7 @@ public class Player implements ActionListener {
 	private static int nextId = 0;
 	private int savedGameID = 0;
 	private int Id;
-	int numberofwins;
+	int numberofwins = 0, numberoflosses = 0;
 	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame;
 	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel, deleteGameLabel;
 	JTextField txtUser,txtPword;
