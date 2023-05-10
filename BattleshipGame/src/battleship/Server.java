@@ -300,7 +300,12 @@ public class Server extends JFrame implements Runnable {
 						retArrList.add(returnMessage);
 						outputToClient.writeObject(retArrList);
 						outputToClient.flush();
-
+					}
+					else if(typeStr.equals("WinsandLosses")) {
+						String tempUsername = (String)sentArr.get(1);
+						int numWins = getUserWins(tempUsername);
+						int numLosses = getUserLosses(tempUsername);
+						
 					}
 			        
 		        }
@@ -311,6 +316,53 @@ public class Server extends JFrame implements Runnable {
 	    }
 	}
 
+	public static int getUserWins(String username) {
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		ResultSet rs = null;
+		int numWins = 0;
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
+			String queryString = "SELECT numberofwins FROM users WHERE username = ?";
+			preparedStatement = connection.prepareStatement(queryString);
+			preparedStatement.setString(1, username);
+			rs = preparedStatement.executeQuery();
+			rs.next();
+			
+			numWins = rs.getInt(1);
+			preparedStatement.close();
+			connection.close();
+			rs.close();	
+			
+		}catch (SQLException ex) {
+		    ex.printStackTrace();
+		}
+		return numWins;
+	}
+	
+	public static int getUserLosses(String username) {
+		PreparedStatement preparedStatement = null;
+		Connection connection = null;
+		ResultSet rs = null;
+		int numLosses = 0;
+		try {
+			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
+			String queryString = "SELECT numberoflosses FROM users WHERE username = ?";
+			preparedStatement = connection.prepareStatement(queryString);
+			preparedStatement.setString(1, username);
+			rs = preparedStatement.executeQuery();
+			rs.next();
+			
+			numLosses = rs.getInt(1);
+			preparedStatement.close();
+			connection.close();
+			rs.close();	
+			
+		}catch (SQLException ex) {
+		    ex.printStackTrace();
+		}
+		return numLosses;
+	}
 	
 	public static String checkUsername(String username) {
 		PreparedStatement preparedStatement = null;
