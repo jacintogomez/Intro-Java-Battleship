@@ -925,6 +925,15 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		else if(cmd.equals("Close")) {
 			frameWinsLosses.dispose();
 		}
+		else if(cmd.equals("Start new game")) {
+			frameEndGame.dispose();
+			this.dispose();
+			Board newGame = new Board(this.username, this.password);
+			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			newGame.setLocationRelativeTo(null);
+		    newGame.setVisible(true);    
+		    newGame.setResizable(true);
+		}
 	}
 	
 	public void checkifgameover() {
@@ -1092,7 +1101,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		frameEndGame.setLayout(new BorderLayout());
 		JLabel endGameLabel = null;
 		if(playerWon == true) {
-			endGameLabel = new JLabel("Congratulations!", SwingConstants.CENTER);
+			endGameLabel = new JLabel("Congratulations! You won!", SwingConstants.CENTER);
 		}
 		else {
 			endGameLabel = new JLabel("Sorry! Better luck next time!", SwingConstants.CENTER);
@@ -1100,8 +1109,11 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		JPanel topPanel = new JPanel();
 		topPanel.add(endGameLabel);
 		JButton btnExitGame = new JButton("Exit game");
+		JButton btnStartGame = new JButton("Start new game");
+		btnStartGame.addActionListener(this);
 		btnExitGame.addActionListener(this);
-		JPanel bottomPanel = new JPanel(new GridLayout(1,1));
+		JPanel bottomPanel = new JPanel(new GridLayout(1,2));
+		bottomPanel.add(btnStartGame);
 		bottomPanel.add(btnExitGame);
 		
 		frameEndGame.add(topPanel, BorderLayout.NORTH);
