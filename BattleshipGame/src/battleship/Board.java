@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.text.*;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -47,7 +48,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	private Queue<Coordinate> attack;
 	
 	private JButton fire, btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
-	private JLabel deleteGameLabel;
+	private JLabel deleteGameLabel,warning;
 	private JFrame frameDeleteGame, frameEndGame, frameWinsLosses;
 	private JTextField enter;
 	private String choice;
@@ -188,7 +189,11 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public long getSerialId() {
 		return this.serialVersionUID;
 	}
-	
+
+	public void setwarning(String warn) {
+		this.warning.setText(warn);
+	}
+
 	public void launchgame() {
 		gameinprogress=true;
 		attack=new LinkedList<Coordinate>();
@@ -364,6 +369,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		
 		//rightboard.add(enter,BorderLayout.NORTH);
 		//rightboard.add(fire,BorderLayout.NORTH);
+		warning=new JLabel("");
+		warning.setForeground(Color.RED);
+		rightboard.add(warning,BorderLayout.NORTH);
 		messages=new JTextArea();
 		messages.setPreferredSize(new Dimension(200, messages.getPreferredSize().height));
 		messages.setEditable(false);
@@ -400,8 +408,10 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		int x=-1,y=-1,counter=0;
 		do {
 			try {
-				if(counter>0) {
+				if(counter==1) {
 					if (isvalid(x, y)) {
+						setwarning(choice+" is already guessed! Please guess again");
+						//messages.insert(choice+" is already guessed; please guess again"+'\n', 0);
 						System.out.println("that coordinate is already guessed; guess again");
 					}
 				}
@@ -409,9 +419,11 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				x = Integer.parseInt(choice.substring(1))-1;
 				counter++;
 			}catch(Exception e) {
-				System.out.println("invalid input");
+				setwarning("Invalid coordinate! Please guess again");
+				//System.out.println("invalid input");
 			}
 		}while(!isvalid(x,y)||opgrid[x][y]==3||opgrid[x][y]==4);
+		setwarning("");
 		String hitormiss="";
 		String aftermessage="";
 		if(opgrid[x][y]==1){
