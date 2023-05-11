@@ -104,7 +104,7 @@ public class Player implements ActionListener {
 		frameWinsLosses.add(topPanel, BorderLayout.NORTH);
 		frameWinsLosses.add(midPanel, BorderLayout.CENTER);
 		frameWinsLosses.add(bottomPanel, BorderLayout.SOUTH);
-		
+		frameWinsLosses.setLocationRelativeTo(null);
 		frameWinsLosses.setVisible(true);
 	}
 	
@@ -147,6 +147,7 @@ public class Player implements ActionListener {
 		warningPanel.add(userInfoErrorLabelOne);
 		warningPanel.add(userInfoErrorLabelTwo);
 		frameEnterInfo.add(warningPanel, BorderLayout.SOUTH);
+		frameEnterInfo.setLocationRelativeTo(null);
 		frameEnterInfo.setVisible(true);
 		
 	}
@@ -211,6 +212,7 @@ public class Player implements ActionListener {
 		frameNewLoad.add(pnlBottom, BorderLayout.SOUTH);
 		
 		//frame.pack();
+		frameNewLoad.setLocationRelativeTo(null);
 		frameNewLoad.setVisible(true);
 	}
 	
@@ -266,6 +268,7 @@ public class Player implements ActionListener {
 			//System.out.println("BLAHBLAHBLAH" + this.username + "\n" + this.password + "BLAHBLAHBLAH");
 			newGame = new Board(this.username, this.password);
 			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			newGame.setLocationRelativeTo(null);
 		    newGame.setVisible(true);    
 		    newGame.setResizable(true);
 		   
@@ -287,6 +290,7 @@ public class Player implements ActionListener {
 				newGame = new Board(tempUsername,tempPassword,tempMygrid,tempOpgrid,tempMyships,
 						tempOpships,tempMyhitsleft,tempOphitsleft, true, tempAttack);
 				newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				newGame.setLocationRelativeTo(null);
 			    newGame.setVisible(true);    
 			    newGame.setResizable(true);
 				//saveGameUI();

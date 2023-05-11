@@ -1111,6 +1111,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		
 		frameEndGame.add(topPanel, BorderLayout.NORTH);
 		frameEndGame.add(bottomPanel,BorderLayout.CENTER);
+		frameEndGame.setLocationRelativeTo(null);
 		frameEndGame.setVisible(true);
 	}
 	
@@ -1144,6 +1145,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		
 		frameDeleteGame.add(pnlLabel, BorderLayout.NORTH);
 		frameDeleteGame.add(pnlButton, BorderLayout.CENTER);
+		frameDeleteGame.setLocationRelativeTo(null);
 		
 		//frame.pack();
 		frameDeleteGame.setVisible(true);
@@ -1252,7 +1254,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		frameWinsLosses.add(topPanel, BorderLayout.NORTH);
 		frameWinsLosses.add(midPanel, BorderLayout.CENTER);
 		frameWinsLosses.add(bottomPanel, BorderLayout.SOUTH);
-		
+		frameWinsLosses.setLocationRelativeTo(null);
 		frameWinsLosses.setVisible(true);
 	}
 	
