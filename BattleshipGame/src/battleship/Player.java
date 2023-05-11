@@ -4,6 +4,7 @@ import java.util.*;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
@@ -18,6 +19,8 @@ import javax.swing.*;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -153,6 +156,7 @@ public class Player implements ActionListener {
 	}
 	
 	private void connectionUI() {
+        
 		frameConnection = new JFrame("Connection Panel");
 		frameConnection.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ta = new JTextArea(30,30);
