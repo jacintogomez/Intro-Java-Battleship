@@ -414,8 +414,10 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				if(counter==1) {
 					if (isvalid(x, y)) {
 						setwarning(choice+" is already guessed! Please guess again");
-						//messages.insert(choice+" is already guessed; please guess again"+'\n', 0);
 						System.out.println("that coordinate is already guessed; guess again");
+					}else {
+						setwarning(choice + " is not a valid coordinate! Please guess again");
+						System.out.println(choice + " is not a valid coordinate! Please guess again");
 					}
 				}
 				y=reverse(choice.charAt(0));
@@ -687,7 +689,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			int len;
 	        do {
 	        	counter++;
-	        	if(counter>1) {frame.setwarning("invalid/overlapping location; pick again");}
+	        	if(counter>1) {frame.setwarning("Invalid/overlapping location. Pick again!");}
 	        	while(!initialized) {
 	        		timedelay(0.5);
 		        	System.out.println("uninitialized");
@@ -703,7 +705,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				len=s.getHoles();
 				System.out.println("coordinate for "+s.name+" is "+row+":"+col+" "+dir);
 	        }while(conflicts(col,row,dir,len,true));
-	        System.out.println("already out");
 	        initialized=false;
 			if(dir=="up") {
 				while(len>0&&row>=0) {
