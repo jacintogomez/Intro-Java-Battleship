@@ -310,26 +310,29 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	                for (int y = 0; y < 10; y++) {
 	                	char corner=isthisacornero(x,y);
 	                	g.setColor(gettilecolor(opgrid[x][y],false));
-	                   	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
-//	                    }else {
-//	                    	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
-//	                    	if(corner=='l') {
-//	                    		g.fillRect((x * width)+xoffset+cellwidth/2+1, (y * height)+yoffset+1, width/2-2, height-2);
-//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-//	                    	}
-//	                    	if(corner=='r') {
-//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width/2-2, height-2);
-//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-//	                    	}
-//	                    	if(corner=='t') {
-//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+cellwidth/2+1, width-2, height/2-2);
-//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-//	                    	}
-//	                    	if(corner=='b') {
-//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height/2-2);
-//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-//	                    	}
-//	                    }
+						if(corner=='n') {
+							g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+	                    }else {
+							g.setColor(Color.BLUE);
+							g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+							g.setColor(gettilecolor(opgrid[x][y],false));
+							if(corner=='l') {
+								g.fillRect((x * width)+xoffset+cellwidth/2+1, (y * height)+yoffset+1, width/2-1, height-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='r') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width/2-2, height-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='t') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+cellwidth/2+1, width-2, height/2-1);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='b') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height/2-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+	                    }
 	                }
 	            }
 	            for (int x = 0; x < 10; x++) {
@@ -807,16 +810,14 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		
 	public Color gettilecolor(int code, boolean thisismygrid) {
 	    Color col=Color.BLUE;
-	    if(!thisismygrid) {return col;}
+	    if(!thisismygrid&&gameinprogress) {return col;}
 	    if(code%2==0) {col=Color.GRAY;}
 	    return col;
 	}
 	
 	public Color getholecolor(int code,boolean thisismygrid) {
 		Color col=Color.blue;
-		if(code==2) {
-			if(thisismygrid) {col=Color.gray;}
-		}
+		if(code==2) {if(thisismygrid) {col=Color.gray;}}
 		if(code==3) {col=Color.white;}
 		if(code==4) {col=Color.red;}
 		return col;
@@ -1257,7 +1258,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	
 	public static void main(String[] args) {
-		Board game=new Board("me","12345");
+		Board game=new Board("Fayed","12345");
 		game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    game.setVisible(true);    
 	    game.setResizable(true);
