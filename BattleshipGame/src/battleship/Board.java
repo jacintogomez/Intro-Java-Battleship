@@ -99,21 +99,21 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		//setuserships();
 		randomizeuserships();
 		launchgame();
-		try {
-			socket = new Socket("localhost", 8000);
-			try {
-		    	  toServer = new ObjectOutputStream(socket.getOutputStream()); 
-			      fromServer = new ObjectInputStream(socket.getInputStream());
-				      
-			    }
-			    catch (IOException ex) {
-			      messages.append(ex.toString() + '\n');
-			    }
-			messages.append("connected\n");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			messages.append("connection Failure\n");
-		}
+//		try {
+//			socket = new Socket("localhost", 8000);
+//			try {
+//		    	  toServer = new ObjectOutputStream(socket.getOutputStream());
+//			      fromServer = new ObjectInputStream(socket.getInputStream());
+//
+//			    }
+//			    catch (IOException ex) {
+//			      messages.append(ex.toString() + '\n');
+//			    }
+//			messages.append("connected\n");
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//			messages.append("connection Failure\n");
+//		}
 	}
 	
 	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,
@@ -393,28 +393,27 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		this.add(topPanel,BorderLayout.NORTH);
 	}
 	
-	public boolean isvalid(int x,int y) {
-		return x>=0&&y>=0&&x<=9&&y<=9;
-	}
+	public boolean isvalid(int x,int y) {return x>=0&&y>=0&&x<=9&&y<=9;}
 	
 	public void myturn() {
 		System.out.println("my turns choice is "+choice);
-		int x=0,y=0;
+		int x=-1,y=-1,counter=0;
 		do {
 			try {
+				if(counter>0) {
+					if (isvalid(x, y)) {
+						System.out.println("that coordinate is already guessed; guess again");
+					}
+				}
 				y=reverse(choice.charAt(0));
-				//int num = Integer.parseInt(choice.substring(1));
-				x=(choice.length()==3)?9:Integer.parseInt((""+choice.charAt(1)))-1;
+				x = Integer.parseInt(choice.substring(1))-1;
+				counter++;
 			}catch(Exception e) {
 				System.out.println("invalid input");
 			}
-		}while(!isvalid(x,y));
+		}while(!isvalid(x,y)||opgrid[x][y]==3||opgrid[x][y]==4);
 		String hitormiss="";
 		String aftermessage="";
-//		if(!isvalid(x,y)) {
-//			System.out.println("invalid input, your turn has been skipped");
-//			return;
-//		}
 		if(opgrid[x][y]==1){
 			hitormiss="Miss";
 			opgrid[x][y]=3;
@@ -461,7 +460,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				y=pickspot(10);
 			}while(mygrid[x][y]!=1&&mygrid[x][y]!=2);
 		}
-		computerguess+=convert(x)+y;
+		computerguess+=convert(y)+Integer.toString(x+1);
 		if(mygrid[x][y]==1) {
 			hitormiss="Miss";
 			mygrid[x][y]=3;
