@@ -97,24 +97,24 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		setuserships();
-		//randomizeuserships();
+		//setuserships();
+		randomizeuserships();
 		launchgame();
-//		try {
-//			socket = new Socket("localhost", 8000);
-//			try {
-//		    	  toServer = new ObjectOutputStream(socket.getOutputStream());
-//			      fromServer = new ObjectInputStream(socket.getInputStream());
-//
-//			    }
-//			    catch (IOException ex) {
-//			      messages.append(ex.toString() + '\n');
-//			    }
-//			messages.append("connected\n");
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//			messages.append("connection Failure\n");
-//		}
+		try {
+			socket = new Socket("localhost", 8000);
+			try {
+		    	  toServer = new ObjectOutputStream(socket.getOutputStream());
+			      fromServer = new ObjectInputStream(socket.getInputStream());
+
+			    }
+			    catch (IOException ex) {
+			      messages.append(ex.toString() + '\n');
+			    }
+			messages.append("connected\n");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			messages.append("connection Failure\n");
+		}
 	}
 	
 	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,
@@ -939,18 +939,18 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		}
 		if(myhitsleft==0) {
 			winner.append("Computer Wins!");
-//			computerWon = true;
-//			updateWinLoss();
-//			deleteGame();
-//			endGameUI();
-			//System.out.println("Computer Wins!");
+			computerWon = true;
+			updateWinLoss();
+			deleteGame();
+			endGameUI();
+			System.out.println("Computer Wins!");
 		}else {
 			winner.append(username+" Wins!");
-//			playerWon = true;
-//			updateWinLoss();
-//			deleteGame();
-//			endGameUI();
-			//System.out.println(username+" Wins!");
+			playerWon = true;
+			updateWinLoss();
+			deleteGame();
+			endGameUI();
+			System.out.println(username+" Wins!");
 		}
 		gameinprogress=false;
 	}
