@@ -1,5 +1,8 @@
 package battleship;
 
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.io.*;
 import java.net.*;
 
@@ -33,6 +36,12 @@ public class Server extends JFrame implements Runnable {
 		this.add(sp);
 
 	    setSize(400, 200);
+	    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice defaultScreen = ge.getDefaultScreenDevice();
+        Rectangle rect = defaultScreen.getDefaultConfiguration().getBounds();
+        int xPart = (int) rect.getMaxX() - this.getWidth();
+        int yPart = 0;
+        this.setLocation(xPart, yPart);
 	    Thread t = new Thread(this);
 	    t.start();
 	}
