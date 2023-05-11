@@ -32,7 +32,8 @@ public class Player implements ActionListener {
 	int numberofwins = 0, numberoflosses = 0;
 	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame,
 		btnWinLossRecord;
-	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel, deleteGameLabelOne, deleteGameLabelTwo;
+	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel, deleteGameLabelOne, deleteGameLabelTwo,
+		userInfoErrorLabelOne, userInfoErrorLabelTwo, noLoadedGameLabel;
 	JTextField txtUser,txtPword;
 	JFrame frameNewLoad, frameEnterInfo, frameConnection, frameUserType, frameSaveGame, frameDeleteGame, frameWinsLosses;
 	JTextField textField = null;
@@ -110,7 +111,7 @@ public class Player implements ActionListener {
 	private void userLoginUI() {
 		frameEnterInfo = new JFrame();
 		frameEnterInfo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameEnterInfo.setSize(400,150);
+		frameEnterInfo.setSize(450,175);
 		frameEnterInfo.setLayout(new BorderLayout());
 		JLabel usrLabel = new JLabel("Register as new user or login as existing user", SwingConstants.CENTER);
 		frameEnterInfo.add(usrLabel, BorderLayout.NORTH);
@@ -137,6 +138,15 @@ public class Player implements ActionListener {
 		pnlInput.add(btnRegisterNewUser);
 		pnlInput.add(btnLoginExistingUser);
 		frameEnterInfo.add(pnlInput, BorderLayout.CENTER);
+		
+		userInfoErrorLabelOne = new JLabel(" ");
+		userInfoErrorLabelOne.setForeground(Color.RED);
+		userInfoErrorLabelTwo = new JLabel(" ");
+		userInfoErrorLabelTwo.setForeground(Color.RED);
+		JPanel warningPanel = new JPanel(new GridLayout(2,1));
+		warningPanel.add(userInfoErrorLabelOne);
+		warningPanel.add(userInfoErrorLabelTwo);
+		frameEnterInfo.add(warningPanel, BorderLayout.SOUTH);
 		frameEnterInfo.setVisible(true);
 		
 	}
@@ -170,7 +180,7 @@ public class Player implements ActionListener {
 	{
 		frameNewLoad = new JFrame();
 		frameNewLoad.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameNewLoad.setSize(600,100);
+		frameNewLoad.setSize(600,125);
 		//Layout of Main Window
 		frameNewLoad.setLayout(new BorderLayout());
 		
@@ -191,9 +201,14 @@ public class Player implements ActionListener {
 		pnlButton.add(btnLoadGame);
 		pnlButton.add(btnWinLossRecord);
 		
+		JPanel pnlBottom = new JPanel();
+		noLoadedGameLabel = new JLabel(" ");
+		noLoadedGameLabel.setForeground(Color.RED);
+		pnlBottom.add(noLoadedGameLabel);
 		
 		frameNewLoad.add(pnlLabel, BorderLayout.NORTH);
 		frameNewLoad.add(pnlButton, BorderLayout.CENTER);
+		frameNewLoad.add(pnlBottom, BorderLayout.SOUTH);
 		
 		//frame.pack();
 		frameNewLoad.setVisible(true);
@@ -313,13 +328,25 @@ public class Player implements ActionListener {
 			Object object = null;
 			object = fromServer.readObject();
 			String messageForPlayer = (String)object;
-	        ta.append(messageForPlayer + "\n");
+	        
 	        if(messageForPlayer.equals("Welcome back!") || messageForPlayer.equals("Username and password saved!")) {
 	        	this.username = username;
 	        	this.password = password;
+	        	ta.append(messageForPlayer + "\n");
 	        	//frameUserType.dispose();
 	        	frameEnterInfo.dispose();
 	        	newOrLoadGameUI();
+	        }
+	        else {
+	        	
+	        	if(messageForPlayer.equals("This username has already been chosen!\nPlease choose another username!")) {
+	        		userInfoErrorLabelOne.setText("This username has already been chosen!");
+	        		userInfoErrorLabelTwo.setText("Please choose another username!");
+	        	}
+	        	else if(messageForPlayer.equals("This username/password combination does not exist!\nPlease enter your existing username/password or register as a new user!")) {
+	        		userInfoErrorLabelOne.setText("This username/password combination does not exist!");
+	        		userInfoErrorLabelTwo.setText("Please enter an existing username/password or register as a new user!");
+	        	}
 	        }
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -376,12 +403,13 @@ public class Player implements ActionListener {
 	        Object object = null;
 			
 			object = fromServer.readObject();
-			if(object.toString().equals(tempStr.toString())) {
-				ta.append(tempStr + "\n");
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			String gameString = (String)retArr.get(0);
+			if(gameString.equals("You do not have a game saved.\nPlease start a new game!")) {
+				//ta.append(tempStr + "\n");
+				noLoadedGameLabel.setText(tempStr);
 			}
 			else {
-				ArrayList<Object> retArr = (ArrayList<Object>)object;
-				String gameString = (String)retArr.get(0);
 				loadedGame = (Board)retArr.get(1);
 				ta.append(gameString.toString());	
 			}

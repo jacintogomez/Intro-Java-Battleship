@@ -201,7 +201,9 @@ public class Server extends JFrame implements Runnable {
 				        }
 				        else {
 				        	returnMessage = "You do not have a game saved.\nPlease start a new game!";
-				        	outputToClient.writeObject(returnMessage);
+				        	ArrayList<Object> retArrList = new ArrayList<>();
+							retArrList.add(returnMessage);
+				        	outputToClient.writeObject(retArrList);
 				        	outputToClient.flush();
 				        }
 					}
