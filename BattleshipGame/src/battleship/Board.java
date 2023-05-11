@@ -97,8 +97,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		//setuserships();
-		randomizeuserships();
+		setuserships();
+		//randomizeuserships();
 		launchgame();
 //		try {
 //			socket = new Socket("localhost", 8000);
@@ -310,26 +310,29 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	                for (int y = 0; y < 10; y++) {
 	                	char corner=isthisacornero(x,y);
 	                	g.setColor(gettilecolor(opgrid[x][y],false));
-	                   	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
-//	                    }else {
-//	                    	g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
-//	                    	if(corner=='l') {
-//	                    		g.fillRect((x * width)+xoffset+cellwidth/2+1, (y * height)+yoffset+1, width/2-2, height-2);
-//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-//	                    	}
-//	                    	if(corner=='r') {
-//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width/2-2, height-2);
-//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-//	                    	}
-//	                    	if(corner=='t') {
-//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+cellwidth/2+1, width-2, height/2-2);
-//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-//	                    	}
-//	                    	if(corner=='b') {
-//	                    		g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height/2-2);
-//		                    	g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
-//	                    	}
-//	                    }
+						if(corner=='n') {
+							g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+	                    }else {
+							g.setColor(Color.BLUE);
+							g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2);
+							g.setColor(gettilecolor(opgrid[x][y],false));
+							if(corner=='l') {
+								g.fillRect((x * width)+xoffset+cellwidth/2+1, (y * height)+yoffset+1, width/2-1, height-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='r') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width/2-2, height-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='t') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+cellwidth/2+1, width-2, height/2-1);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+							if(corner=='b') {
+								g.fillRect((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height/2-2);
+								g.fillArc((x * width)+xoffset+1, (y * height)+yoffset+1, width-2, height-2,0,360);
+							}
+	                    }
 	                }
 	            }
 	            for (int x = 0; x < 10; x++) {
@@ -404,7 +407,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public boolean isvalid(int x,int y) {return x>=0&&y>=0&&x<=9&&y<=9;}
 	
 	public void myturn() {
-		System.out.println("my turns choice is "+choice);
+		System.out.println("my choice is "+choice);
 		int x=-1,y=-1,counter=0;
 		do {
 			try {
@@ -457,20 +460,23 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 
 	public void computerturn() {
 		timedelay(1);
-		int x;
-		int y;
+		int x=-1;
+		int y=-1;
 		String hitormiss="";
 		String computerguess="";
 		String aftermessage="";
 		if(!attack.isEmpty()) {
-			Coordinate suggestion=attack.remove();
-			x=suggestion.rawcolumn;
-			y=suggestion.rawrow;
+			do {
+				if(attack.isEmpty()){break;}
+				Coordinate suggestion = attack.remove();
+				x = suggestion.rawcolumn;
+				y = suggestion.rawrow;
+			}while(alreadyhitorsurrounded(x,y));
 		}else {
 			do {
 				x=pickspot(10);
 				y=pickspot(10);
-			}while(mygrid[x][y]!=1&&mygrid[x][y]!=2);
+			}while(alreadyhitorsurrounded(x,y));
 		}
 		computerguess+=convert(y)+Integer.toString(x+1);
 		if(mygrid[x][y]==1) {
@@ -481,8 +487,10 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			hitormiss="Hit";
 			mygrid[x][y]=4;
 			myhitsleft--;
-			for(int z=1;z<=4;z++) {
-				addsuspiciouslocations(x,y,z);
+			List<Integer> order=Arrays.asList(1,2,3,4);
+			Collections.shuffle(order);
+			for(int z=0;z<4;z++) {
+				addsuspiciouslocations(x,y,order.get(z));
 			}
 			for(Ship s:myships) {
 				s.checkifstruck(new Coordinate(x,y));
@@ -491,7 +499,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				if(s.active&&(s.holes==s.struck)) {
 					s.active=false;
 					aftermessage="Computer sunk "+this.username+"'s "+s.name+'\n';
-					attack.clear();
+					//attack.clear();
 				}
 			}
 			checkifgameover();
@@ -504,10 +512,40 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public void addsuspiciouslocations(int x,int y,int c) {
-		if(c==1&&isvalid(x,y-1)&&mygrid[x][y-1]!=3&&mygrid[x][y-1]!=4) {attack.add(new Coordinate(x,y-1));};
-		if(c==2&&isvalid(x,y+1)&&mygrid[x][y+1]!=3&&mygrid[x][y+1]!=4) {attack.add(new Coordinate(x,y+1));};
-		if(c==3&&isvalid(x+1,y)&&mygrid[x+1][y]!=3&&mygrid[x+1][y]!=4) {attack.add(new Coordinate(x+1,y));};
-		if(c==4&&isvalid(x-1,y)&&mygrid[x-1][y]!=3&&mygrid[x-1][y]!=4) {attack.add(new Coordinate(x-1,y));};
+		try{
+			if(c==1&&isvalid(x,y-1)&&mygrid[x][y-1]!=3&&mygrid[x][y-1]!=4) {attack.add(new Coordinate(x,y-1));};
+			if(c==2&&isvalid(x,y+1)&&mygrid[x][y+1]!=3&&mygrid[x][y+1]!=4) {attack.add(new Coordinate(x,y+1));};
+			if(c==3&&isvalid(x+1,y)&&mygrid[x+1][y]!=3&&mygrid[x+1][y]!=4) {attack.add(new Coordinate(x+1,y));};
+			if(c==4&&isvalid(x-1,y)&&mygrid[x-1][y]!=3&&mygrid[x-1][y]!=4) {attack.add(new Coordinate(x-1,y));};
+		}catch(Exception e) {
+			System.out.println("Index was out of bounds");
+		}
+	}
+
+	public boolean alreadyhitorsurrounded(int x,int y) {
+		boolean bottom=false,top=false,left=false,right=false;
+		if (mygrid[x][y] == 3 || mygrid[x][y] == 4) {return true;}
+		try{
+			bottom=mygrid[x][y-1]==3;
+		}catch(Exception e){
+			bottom=true;
+		}
+		try{
+			top=mygrid[x][y+1]==3;
+		}catch(Exception e){
+			bottom=true;
+		}
+		try{
+			left=mygrid[x-1][y]==3;
+		}catch(Exception e){
+			bottom=true;
+		}
+		try{
+			right=mygrid[x+1][y]==3;
+		}catch(Exception e){
+			bottom=true;
+		}
+		return bottom&&top&&left&&right;
 	}
 		
 	public void createships() {
@@ -521,11 +559,11 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		Ship enemy_patrol=new Ship("Patrol Boat",2);
 		Ship enemy_battleship=new Ship("Battleship",4);
 		Ship enemy_carrier=new Ship("Carrier",5);
+		myships.add(carrier);
+		myships.add(battleship);
 		myships.add(destroyer);
 		myships.add(submarine);
 		myships.add(patrol);
-		myships.add(battleship);
-		myships.add(carrier);
 		opships.add(enemy_destroyer);
 		opships.add(enemy_submarine);
 		opships.add(enemy_patrol);
@@ -772,16 +810,14 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		
 	public Color gettilecolor(int code, boolean thisismygrid) {
 	    Color col=Color.BLUE;
-	    if(!thisismygrid) {return col;}
+	    if(!thisismygrid&&gameinprogress) {return col;}
 	    if(code%2==0) {col=Color.GRAY;}
 	    return col;
 	}
 	
 	public Color getholecolor(int code,boolean thisismygrid) {
 		Color col=Color.blue;
-		if(code==2) {
-			if(thisismygrid) {col=Color.gray;}
-		}
+		if(code==2) {if(thisismygrid) {col=Color.gray;}}
 		if(code==3) {col=Color.white;}
 		if(code==4) {col=Color.red;}
 		return col;
@@ -792,6 +828,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 	
 	public int reverse(char row) {
+		if(row>=97&&row<=106){row-=32;}
 		return row-65;
 	}
 	
@@ -805,7 +842,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			choice=enter.getText().trim();
-			System.out.println("the choice is "+choice);
 			enter.setText("");
 		}
 	}
@@ -903,17 +939,17 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		}
 		if(myhitsleft==0) {
 			winner.append("Computer Wins!");
-			computerWon = true;
-			updateWinLoss();
-			deleteGame();
-			endGameUI();
+//			computerWon = true;
+//			updateWinLoss();
+//			deleteGame();
+//			endGameUI();
 			//System.out.println("Computer Wins!");
 		}else {
 			winner.append(username+" Wins!");
-			playerWon = true;
-			updateWinLoss();
-			deleteGame();
-			endGameUI();
+//			playerWon = true;
+//			updateWinLoss();
+//			deleteGame();
+//			endGameUI();
 			//System.out.println(username+" Wins!");
 		}
 		gameinprogress=false;
@@ -1222,7 +1258,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	
 	public static void main(String[] args) {
-		Board game=new Board("me","12345");
+		Board game=new Board("Fayed","12345");
 		game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    game.setVisible(true);    
 	    game.setResizable(true);
