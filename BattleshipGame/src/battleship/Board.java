@@ -47,7 +47,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	private boolean gameinprogress, playerWon = false, computerWon = false, loadedGame = false;
 	private Queue<Coordinate> attack;
 	
-	private JButton fire, btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
+	private JButton btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
 	private JLabel deleteGameLabel,warning;
 	private JFrame frameDeleteGame, frameEndGame, frameWinsLosses;
 	private JTextField enter;
@@ -199,8 +199,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		attack=new LinkedList<Coordinate>();
 		enter=new JTextField(5);
 		enter.addActionListener(new textfieldlistener());
-		fire=new JButton("Fire");
-		fire.addActionListener(new addfirelistener());
 		this.setBackground(Color.LIGHT_GRAY);
 	    setSize(gamewidth,gameheight);
 	    createpanel();
@@ -394,8 +392,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		leftboard.repaint();
 		JPanel enterPanel = new JPanel();
 		enterPanel.setLayout(new GridLayout(1,2));
+		JLabel enterLabel = new JLabel("Enter coordinates to attack: ");
+		enterPanel.add(enterLabel);
 		enterPanel.add(enter);
-		enterPanel.add(fire);
 		topPanel.add(enterPanel,BorderLayout.EAST);
 		topPanel.add(viewRecordPanel, BorderLayout.CENTER);
 		topPanel.add(savePanel, BorderLayout.WEST);
@@ -847,12 +846,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		}
 	}
 	
-	public class addfirelistener implements ActionListener{
-		@Override
-		public void actionPerformed(ActionEvent e) {
-		}
-	}
-	
 	@Override
 	public void actionPerformed(ActionEvent evt) {		
 		String cmd = evt.getActionCommand();
@@ -924,6 +917,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				frameEndGame.dispose();
 			}
 			this.dispose();
+			//System.exit(0);
 		}
 		else if(cmd.equals("View Win/Loss Record")) {
 			getNumWinsLosses();

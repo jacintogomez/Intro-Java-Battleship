@@ -95,7 +95,7 @@ public class Server extends JFrame implements Runnable {
 						object = inputFromClient.readObject();
 					} 
 					catch (EOFException e) {
-						e.printStackTrace();
+						//e.printStackTrace();
 						break;
 					}
 					catch (ClassNotFoundException e) {
@@ -104,7 +104,7 @@ public class Server extends JFrame implements Runnable {
 					}
 					ArrayList<Object> sentArr = (ArrayList<Object>)object;
 					typeStr = (String)sentArr.get(0);
-					ta.append(typeStr + "\n");
+					//ta.append(typeStr + "\n");
 					if(typeStr.equals("userInfo")) {
 						String[] sentStr = (String[])sentArr.get(1);
 						String username = sentStr[0];
@@ -154,7 +154,7 @@ public class Server extends JFrame implements Runnable {
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
 						String gameStatus = checkGame(gameToSave);
-						System.out.println("Save Flag: " + saveFlag + " tempLoad: " + tempLoad + "\n");
+						//System.out.println("Save Flag: " + saveFlag + " tempLoad: " + tempLoad + "\n");
 						if(gameStatus.equals("Game exists")) {
 							if(saveFlag == true || (saveFlag == false && tempLoad == true)) {
 								ArrayList<Object> retArrList = new ArrayList<>();
@@ -187,7 +187,7 @@ public class Server extends JFrame implements Runnable {
 						String[] tempStr = (String[])sentArr.get(1);
 						String username = tempStr[0];
 						String password = tempStr[1];
-						ta.append("Username: " + username + "\nPassword: " + password + "\n");
+						//ta.append("Username: " + username + "\nPassword: " + password + "\n");
 						
 						String statusString = checkGameForLoad(username, password);
 				        if(statusString.equals("Game exists")) {
@@ -274,8 +274,8 @@ public class Server extends JFrame implements Runnable {
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
-						gameToSave.printGrid();
-						ta.append("About to update!\n");
+						//gameToSave.printGrid();
+						//ta.append("About to update!\n");
 						updateGame(gameToSave);
 						returnMessage = "Game updated!";
 						ArrayList<Object> retArrList = new ArrayList<>();
