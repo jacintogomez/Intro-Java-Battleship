@@ -24,8 +24,6 @@ public class Server extends JFrame implements Runnable {
 	private int setNum = 2;
 	private boolean saveFlag = false;
 	private boolean loadFlag = false;
-	//private ObjectInputStream inputFromClient;
-    //private ObjectOutputStream outputToClient;
     
 	public Server() {
 		super("Game Server");
@@ -90,7 +88,6 @@ public class Server extends JFrame implements Runnable {
 		        	
 		        	String returnMessage = null;
 		        	String typeStr = null;
-		        	//inputFromClient = new ObjectInputStream(socket.getInputStream());
 
         	        Object object = null;
 					try {
@@ -153,7 +150,7 @@ public class Server extends JFrame implements Runnable {
 						int tempMyHitsLeft = (int)sentArr.get(8);
 						int tempOpHitsLeft = (int)sentArr.get(9);
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(10);
-						int savedGameID = (int)sentArr.get(11);
+						
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
 						String gameStatus = checkGame(gameToSave);
@@ -162,8 +159,6 @@ public class Server extends JFrame implements Runnable {
 							if(saveFlag == true || (saveFlag == false && tempLoad == true)) {
 								ArrayList<Object> retArrList = new ArrayList<>();
 								returnMessage = "An earlier version of this game is saved. Updating game to current state.";
-								int gameID = 0;
-								retArrList.add(gameID);
 								retArrList.add(returnMessage);
 								outputToClient.writeObject(retArrList);
 								outputToClient.flush();
@@ -172,8 +167,6 @@ public class Server extends JFrame implements Runnable {
 							else if(saveFlag == false && tempLoad == false){
 								ArrayList<Object> retArrList = new ArrayList<>();
 								returnMessage = "You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n";
-								int gameID = 0;
-								retArrList.add(gameID);
 								retArrList.add(returnMessage);
 								outputToClient.writeObject(retArrList);
 								outputToClient.flush();
@@ -182,10 +175,8 @@ public class Server extends JFrame implements Runnable {
 						else if(gameStatus.equals("No such game exists")) {
 							saveGame(gameToSave);
 							saveFlag = true;
-							int gameID = getSavedGameID(gameToSave);
 							returnMessage = "Game saved!";
 							ArrayList<Object> retArrList = new ArrayList<>();
-							retArrList.add(gameID);
 							retArrList.add(returnMessage);
 							outputToClient.writeObject(retArrList);
 							outputToClient.flush();
@@ -202,10 +193,8 @@ public class Server extends JFrame implements Runnable {
 				        if(statusString.equals("Game exists")) {
 				        	Board game1 = loadGame(username, password);
 				        	loadFlag = true;
-				        	int gameID = getSavedGameID(game1);
 				        	returnMessage = "Game loaded!\n";
 				        	ArrayList<Object> retArrList = new ArrayList<>();
-							retArrList.add(gameID);
 							retArrList.add(returnMessage);
 							retArrList.add(game1);
 				        	outputToClient.writeObject(retArrList);
@@ -226,16 +215,13 @@ public class Server extends JFrame implements Runnable {
 						int tempMyHitsLeft = (int)sentArr.get(7);
 						int tempOpHitsLeft = (int)sentArr.get(8);
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
-						int savedGameID = (int)sentArr.get(10);
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
 						deleteGame(tempUsername, tempPassword);
 						saveGame(gameToSave);
 						saveFlag = true;
-						int gameID = getSavedGameID(gameToSave);
 						returnMessage = "Game saved!";
 						ArrayList<Object> retArrList = new ArrayList<>();
-						retArrList.add(gameID);
 						retArrList.add(returnMessage);
 						outputToClient.writeObject(retArrList);
 						outputToClient.flush();
@@ -250,7 +236,6 @@ public class Server extends JFrame implements Runnable {
 						int tempMyHitsLeft = (int)sentArr.get(7);
 						int tempOpHitsLeft = (int)sentArr.get(8);
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
-						int savedGameID = (int)sentArr.get(10);
 						
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
@@ -258,10 +243,8 @@ public class Server extends JFrame implements Runnable {
 						if(gameStatus.equals("Game exists")) {
 							deleteGame(tempUsername, tempPassword);
 						}
-						int gameID = 0;
 						returnMessage = "Game deleted!";
 						ArrayList<Object> retArrList = new ArrayList<>();
-						retArrList.add(gameID);
 						retArrList.add(returnMessage);
 						outputToClient.writeObject(retArrList);
 						outputToClient.flush();
@@ -287,16 +270,13 @@ public class Server extends JFrame implements Runnable {
 						int tempMyHitsLeft = (int)sentArr.get(7);
 						int tempOpHitsLeft = (int)sentArr.get(8);
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
-						int savedGameID = (int)sentArr.get(10);
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
 						gameToSave.printGrid();
 						ta.append("About to update!\n");
 						updateGame(gameToSave);
-						int gameID = getSavedGameID(gameToSave);
 						returnMessage = "Game updated!";
 						ArrayList<Object> retArrList = new ArrayList<>();
-						retArrList.add(gameID);
 						retArrList.add(returnMessage);
 						outputToClient.writeObject(retArrList);
 						outputToClient.flush();
@@ -546,31 +526,6 @@ public class Server extends JFrame implements Runnable {
 		} catch (IOException | SQLException ex) {
             System.out.println(ex.getMessage());
         } 
-	}
-	
-	public static int getSavedGameID(Board g) {
-		PreparedStatement preparedStatement = null;
-		Connection connection = null;
-		ResultSet rs = null;
-		String inputUsername = g.getUsername();
-		String inputPassword = g.getPassword();
-		int retID = 0;
-		try {
-			connection = DriverManager.getConnection("jdbc:sqlite:Battleship.db");
-			String queryString = "SELECT id FROM objectstore WHERE username = ? and password = ?";
-			preparedStatement = connection.prepareStatement(queryString);
-			preparedStatement.setString(1, inputUsername);
-			preparedStatement.setString(2, inputPassword);
-			rs = preparedStatement.executeQuery();
-			rs.next();
-			retID = rs.getInt("id");
-			preparedStatement.close();
-			connection.close();
-			rs.close();
-		}catch (SQLException ex) {
-		    ex.printStackTrace();
-		}
-		return retID;
 	}
 	
 	public static String checkGame(Board game) {

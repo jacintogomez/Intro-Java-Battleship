@@ -28,7 +28,6 @@ public class Player implements ActionListener {
 	private boolean isNew;
 	private boolean loadedGame = false;
 	private static int nextId = 0;
-	private int savedGameID = 0;
 	private int Id;
 	int numberofwins = 0, numberoflosses = 0;
 	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame,
@@ -382,15 +381,9 @@ public class Player implements ActionListener {
 			}
 			else {
 				ArrayList<Object> retArr = (ArrayList<Object>)object;
-				int gameInt = (int)retArr.get(0);
-				String gameString = (String)retArr.get(1);
-				loadedGame = (Board)retArr.get(2);
-				this.savedGameID = gameInt;
-				ta.append("Game ID: " + this.savedGameID + "\n");
-				ta.append(gameString.toString());
-				//System.out.println("Loaded Game Grid: \n");
-				//loadedGame.printGrid();
-				
+				String gameString = (String)retArr.get(0);
+				loadedGame = (Board)retArr.get(1);
+				ta.append(gameString.toString());	
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

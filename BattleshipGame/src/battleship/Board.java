@@ -66,7 +66,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	private Socket socket;
 	ObjectOutputStream toServer = null;
 	ObjectInputStream fromServer = null;
-	private int savedGameID = 0;
 	
 	public Board() {
 		this.username = "Jacinto";
@@ -958,7 +957,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		messageArray.add(this.myhitsleft);
 		messageArray.add(this.ophitsleft);
 		messageArray.add(this.attack);
-		messageArray.add(this.savedGameID);
     	try {
 			toServer.writeObject(messageArray);
 			toServer.flush();
@@ -967,10 +965,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			object = fromServer.readObject();
 			ArrayList<Object> retArr = (ArrayList<Object>)object;
 			
-			int gameInt = (int)retArr.get(0);
-			String gameString = (String)retArr.get(1);
+			String gameString = (String)retArr.get(0);
 			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
-				//messages.insert(gameString.toString(),0);
 				deleteGameUI();
 			}
 			else if(gameString.equals("An earlier version of this game is saved. Updating game to current state.")) {
@@ -978,7 +974,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				updateGame();
 			}
 			else {
-				this.savedGameID = gameInt;
 				messages.insert(gameString.toString() + "\n",0);
 			}
 
@@ -992,9 +987,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	public void updateGame() {
 		String messageType = "update";
-		//this.setGridCell(5, 5, setNum);
-		//setNum++;
-		//this.printGrid();
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
 		messageArray.add(this.username);
@@ -1006,7 +998,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		messageArray.add(this.myhitsleft);
 		messageArray.add(this.ophitsleft);
 		messageArray.add(this.attack);
-		messageArray.add(this.savedGameID);
 		
 		try {
 			toServer.reset();
@@ -1017,10 +1008,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			object = fromServer.readObject();
 			ArrayList<Object> retArr = (ArrayList<Object>)object;
 			
-			int gameInt = (int)retArr.get(0);
-			String gameString = (String)retArr.get(1);
-			
-			this.savedGameID = gameInt;
+			String gameString = (String)retArr.get(0);
 			messages.insert(gameString.toString() + "\n",0);
 
 		} catch (IOException e) {
@@ -1032,9 +1020,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	public void updateWinLoss() {
 		String messageType = "updateWinLoss";
-		//this.setGridCell(5, 5, setNum);
-		//setNum++;
-		//this.printGrid();
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
 		messageArray.add(this.username);
@@ -1136,7 +1121,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		messageArray.add(this.myhitsleft);
 		messageArray.add(this.ophitsleft);
 		messageArray.add(this.attack);
-		messageArray.add(this.savedGameID);
 		
     	try {
     		if(messageType.equals("delete")) {
@@ -1149,10 +1133,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			object = fromServer.readObject();
 			ArrayList<Object> retArr = (ArrayList<Object>)object;
 			
-			int gameInt = (int)retArr.get(0);
-			String gameString = (String)retArr.get(1);
-			
-			this.savedGameID = gameInt;
+			String gameString = (String)retArr.get(0);
 			messages.insert(gameString.toString() + "\n",0);
 			
 			
