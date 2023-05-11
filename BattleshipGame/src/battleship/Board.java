@@ -97,8 +97,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		ophitsleft=myhitsleft=17;
 		createships();
 		setopponentships();
-		//setuserships();
-		randomizeuserships();
+		setuserships();
+		//randomizeuserships();
 		launchgame();
 //		try {
 //			socket = new Socket("localhost", 8000);
@@ -517,9 +517,29 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public boolean alreadyhitorsurrounded(int x,int y) {
-		if (mygrid[x][y] == 3 || mygrid[x][y] == 4) {System.out.println("already hit");return true;}
-		if (mygrid[x][y - 1] == 3 && mygrid[x][y + 1] == 3 && mygrid[x - 1][y] == 3 && mygrid[x + 1][y] == 3) {System.out.println("surrounded");return true;}
-		return false;
+		boolean bottom=false,top=false,left=false,right=false;
+		if (mygrid[x][y] == 3 || mygrid[x][y] == 4) {return true;}
+		try{
+			bottom=mygrid[x][y-1]==3;
+		}catch(Exception e){
+			bottom=true;
+		}
+		try{
+			top=mygrid[x][y+1]==3;
+		}catch(Exception e){
+			bottom=true;
+		}
+		try{
+			left=mygrid[x-1][y]==3;
+		}catch(Exception e){
+			bottom=true;
+		}
+		try{
+			right=mygrid[x+1][y]==3;
+		}catch(Exception e){
+			bottom=true;
+		}
+		return bottom&&top&&left&&right;
 	}
 		
 	public void createships() {
