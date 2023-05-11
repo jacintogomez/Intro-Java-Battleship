@@ -24,7 +24,7 @@ public class Ship implements Serializable {
 	
 	public void checkifstruck(Coordinate targ) {
 		for(Coordinate c:coords) {
-			System.out.println(this.toString()+" and "+c.toString());
+			//System.out.println(this.toString()+" and "+c.toString());
 			if(targ.equals(c)) {
 				struck++;
 				break;

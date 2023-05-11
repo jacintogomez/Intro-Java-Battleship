@@ -397,21 +397,23 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	public void myturn() {
 		System.out.println("my turns choice is "+choice);
-		int x=0,y=0;
+		int x=-1,y=-1,counter=0;
 		do {
 			try {
+				if(counter>0) {
+					if (isvalid(x, y)) {
+						System.out.println("that coordinate is already guessed; guess again");
+					}
+				}
 				y=reverse(choice.charAt(0));
 				x = Integer.parseInt(choice.substring(1))-1;
+				counter++;
 			}catch(Exception e) {
 				System.out.println("invalid input");
 			}
-		}while(!isvalid(x,y));
+		}while(!isvalid(x,y)||opgrid[x][y]==3||opgrid[x][y]==4);
 		String hitormiss="";
 		String aftermessage="";
-//		if(!isvalid(x,y)) {
-//			System.out.println("invalid input, your turn has been skipped");
-//			return;
-//		}
 		if(opgrid[x][y]==1){
 			hitormiss="Miss";
 			opgrid[x][y]=3;
