@@ -31,10 +31,11 @@ public class Player implements ActionListener {
 	private int savedGameID = 0;
 	private int Id;
 	int numberofwins = 0, numberoflosses = 0;
-	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame;
+	JButton btnNewUser, btnExistingUser, btnUsernameAndPassword, btnNewGame, btnLoadGame, btnDeleteGame, btnContinueGame,
+		btnWinLossRecord;
 	JLabel questionForUser, passwordLabel, usernameLabel, newLoadGameLabel, saveGameLabel, deleteGameLabelOne, deleteGameLabelTwo;
 	JTextField txtUser,txtPword;
-	JFrame frameNewLoad, frameEnterInfo, frameConnection, frameUserType, frameSaveGame, frameDeleteGame;
+	JFrame frameNewLoad, frameEnterInfo, frameConnection, frameUserType, frameSaveGame, frameDeleteGame, frameWinsLosses;
 	JTextField textField = null;
 	JTextArea ta = null;
 	Socket socket = null;
@@ -68,6 +69,43 @@ public class Player implements ActionListener {
 	
 	public String getPassword() {
 		return this.password;
+	}
+	
+	public void createWinsLossesUI(int numWins, int numLosses) {
+		frameWinsLosses = new JFrame();
+		frameWinsLosses.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameWinsLosses.setSize(400,200);
+		frameWinsLosses.setLayout(new BorderLayout());
+		String forTitleLabel = username + "'s Win/Loss Record";
+		JLabel titleLabel = new JLabel(forTitleLabel, SwingConstants.CENTER);
+		JPanel topPanel = new JPanel();
+		topPanel.add(titleLabel);
+		
+		JPanel midPanel = new JPanel(new GridLayout(3,2));
+		JLabel numWinsLabel = new JLabel("Number of wins: ");
+		JLabel numLossesLabel = new JLabel("Number of losses: ");
+		JLabel numgamesLabel = new JLabel("Total games completed: ");
+		JLabel numWinsLabelVal = new JLabel(String.valueOf(numWins), SwingConstants.CENTER);
+		JLabel numLossesLabelVal = new JLabel(String.valueOf(numLosses), SwingConstants.CENTER);
+		JLabel numgamesLabelVal = new JLabel(String.valueOf(numWins + numLosses), SwingConstants.CENTER);
+		
+		midPanel.add(numWinsLabel);
+		midPanel.add(numWinsLabelVal);
+		midPanel.add(numLossesLabel);
+		midPanel.add(numLossesLabelVal);
+		midPanel.add(numgamesLabel);
+		midPanel.add(numgamesLabelVal);
+		
+		JPanel bottomPanel = new JPanel();
+		JButton closeButton = new JButton("Close");
+		closeButton.addActionListener(this);
+		bottomPanel.add(closeButton);
+		
+		frameWinsLosses.add(topPanel, BorderLayout.NORTH);
+		frameWinsLosses.add(midPanel, BorderLayout.CENTER);
+		frameWinsLosses.add(bottomPanel, BorderLayout.SOUTH);
+		
+		frameWinsLosses.setVisible(true);
 	}
 	
 	private void userLoginUI() {
@@ -128,76 +166,16 @@ public class Player implements ActionListener {
 		frameConnection.setSize(400, 200);
 		frameConnection.setVisible(true);
 	}
-	/*
-	private void userTypeUI()
-	{
-		frameUserType = new JFrame();
-		frameUserType.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameUserType.setSize(400,100);
-		//Layout of Main Window
-		frameUserType.setLayout(new BorderLayout());
-		
-		questionForUser = new JLabel("Are You a New or Existing User?");
-		JPanel pnlLabel = new JPanel();
-		pnlLabel.add(questionForUser);
-		btnNewUser = new JButton("New User");
-		btnNewUser.addActionListener(this);
-		
-		btnExistingUser = new JButton("Existing User");
-		btnExistingUser.addActionListener(this);
-		
-		JPanel pnlButton = new JPanel(new GridLayout(1,2));
-		
-		pnlButton.add(btnNewUser);
-		pnlButton.add(btnExistingUser);
-		
-		
-		frameUserType.add(pnlLabel, BorderLayout.NORTH);
-		frameUserType.add(pnlButton, BorderLayout.CENTER);
-		
-		frameUserType.setVisible(true);
-	}
-	*/
-	private void enterInfoUI() {
-		frameEnterInfo = new JFrame();
-		frameEnterInfo.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameEnterInfo.setSize(400,150);
-		
-		usernameLabel = new JLabel("Username: ");
-		passwordLabel = new JLabel("Password: ");
-		
-		txtUser = new JTextField("",15);//To adjust width
-		txtPword = new JTextField();
-		
-		JPanel pnlInput = new JPanel(new GridLayout(2,2));
-		
-		pnlInput.add(usernameLabel);
-		pnlInput.add(txtUser);
-		
-		pnlInput.add(passwordLabel);
-		pnlInput.add(txtPword);
-		
-		btnUsernameAndPassword = new JButton("Enter Username and Password");
-		btnUsernameAndPassword.addActionListener(this);
-		JPanel pnlButton = new JPanel(new GridLayout(1,1));
-		
-		pnlButton.add(btnUsernameAndPassword);
-		
-		frameEnterInfo.add(pnlInput, BorderLayout.NORTH);
-		frameEnterInfo.add(pnlButton, BorderLayout.CENTER);
-		
-		frameEnterInfo.setVisible(true);
-	}
-	
+
 	private void newOrLoadGameUI()
 	{
 		frameNewLoad = new JFrame();
 		frameNewLoad.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameNewLoad.setSize(400,100);
+		frameNewLoad.setSize(600,100);
 		//Layout of Main Window
 		frameNewLoad.setLayout(new BorderLayout());
 		
-		newLoadGameLabel = new JLabel("Start a New Game or Load an Existing Game");
+		newLoadGameLabel = new JLabel("Start a New Game, Load an Existing Game, or View Your Win/Loss Record");
 		JPanel pnlLabel = new JPanel();
 		pnlLabel.add(newLoadGameLabel);
 		btnNewGame = new JButton("Start New Game");
@@ -206,10 +184,13 @@ public class Player implements ActionListener {
 		btnLoadGame = new JButton("Load Existing Game");
 		btnLoadGame.addActionListener(this);
 		
-		JPanel pnlButton = new JPanel(new GridLayout(1,2));
+		btnWinLossRecord = new JButton("View Win/Loss Record");
+		btnWinLossRecord.addActionListener(this);
+		JPanel pnlButton = new JPanel(new GridLayout(1,3));
 		
 		pnlButton.add(btnNewGame);
 		pnlButton.add(btnLoadGame);
+		pnlButton.add(btnWinLossRecord);
 		
 		
 		frameNewLoad.add(pnlLabel, BorderLayout.NORTH);
@@ -218,76 +199,6 @@ public class Player implements ActionListener {
 		//frame.pack();
 		frameNewLoad.setVisible(true);
 	}
-	
-	private void saveGameUI()
-	{
-		frameSaveGame = new JFrame();
-		frameSaveGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameSaveGame.setSize(400,100);
-		//Layout of Main Window
-		frameSaveGame.setLayout(new BorderLayout());
-		
-		saveGameLabel = new JLabel("Do you want to save this game?");
-		JPanel pnlLabel = new JPanel();
-		pnlLabel.add(saveGameLabel);
-		btnNewGame = new JButton("Save Game");
-		btnNewGame.addActionListener(this);
-		
-		
-		JPanel pnlButton = new JPanel(new GridLayout(1,1));
-		
-		pnlButton.add(btnNewGame);
-		
-		
-		frameSaveGame.add(pnlLabel, BorderLayout.NORTH);
-		frameSaveGame.add(pnlButton, BorderLayout.CENTER);
-		
-		//frame.pack();
-		frameSaveGame.setVisible(true);
-	}
-	
-	private void deleteGameUI()
-	{
-		frameDeleteGame = new JFrame();
-		frameDeleteGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frameDeleteGame.setSize(600,100);
-		//Layout of Main Window
-		frameDeleteGame.setLayout(new BorderLayout());
-		
-		deleteGameLabelOne = new JLabel("<html>You already have a different game saved.</html>",SwingConstants.CENTER);
-		deleteGameLabelTwo = new JLabel("<html>Do you want to delete this existing game and save your current game in its place?</html>",SwingConstants.CENTER);
-		JPanel pnlLabel = new JPanel(new GridLayout(2,1));
-		pnlLabel.add(deleteGameLabelOne);
-		pnlLabel.add(deleteGameLabelTwo);
-		btnDeleteGame = new JButton("Yes, delete previous saved game");
-		btnDeleteGame.addActionListener(this);
-		
-		btnContinueGame = new JButton("No, continue current game");
-		btnContinueGame.addActionListener(this);
-		
-		
-		JPanel pnlButton = new JPanel(new GridLayout(1,2));
-		
-		pnlButton.add(btnDeleteGame);
-		pnlButton.add(btnContinueGame);
-		
-		
-		
-		frameDeleteGame.add(pnlLabel, BorderLayout.NORTH);
-		frameDeleteGame.add(pnlButton, BorderLayout.CENTER);
-		
-		//frame.pack();
-		frameDeleteGame.setVisible(true);
-	}
-	
-	/*
-	public class addfirelistener implements ActionListener{
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			System.out.println("Hey! From Player Class!\n");
-		}
-	}
-	*/
 	
 	@Override
 	public void actionPerformed(ActionEvent evt) {		
@@ -299,10 +210,6 @@ public class Player implements ActionListener {
 		}
 		else if(cmd.equals("Login as existing user")) {
 			this.isNew = false;
-			userPwordEnter();
-		}
-		else if(cmd.equals("Enter Username and Password")) {
-			//System.out.println("Username and Pword!");
 			userPwordEnter();
 		}
 		else if(cmd.equals("Open Connection")) {
@@ -371,31 +278,15 @@ public class Player implements ActionListener {
 				//saveGameUI();
 			}
 		}
-		else if(cmd.equals("Save Game")) {
-			saveGame(newGame);
+		else if(cmd.equals("View Win/Loss Record")) {
+			getNumWinsLosses();
 		}
-		else if(cmd.equals("Yes, delete previous saved game")) {
-			frameDeleteGame.dispose();
-			deleteGame(newGame);
-			
+		else if(cmd.equals("Close")) {
+			frameWinsLosses.dispose();
 		}
-		else if(cmd.equals("No, continue current game")) {
-			frameDeleteGame.dispose();
-		}
+		
 	}
-/*	
-	public void newUser() {
-		this.isNew = true;
-		System.out.println(this.isNew);
-		enterInfoUI();
-	}
-	
-	public void existingUser() {
-		this.isNew = false;
-		System.out.println(this.isNew);
-		enterInfoUI();
-	}
-	*/
+
 	public void userPwordEnter() {
 		String username = txtUser.getText().trim();
 		String password = txtPword.getText().trim();
@@ -439,43 +330,34 @@ public class Player implements ActionListener {
 		
 	}
 	
-public void saveGame(Board game) {
-		//System.out.println("Check game to save: \n");
-		//game.printGrid();
-		String messageType = "save";
+	public void getNumWinsLosses() {
+		String messageType = "WinsandLosses";
 		ArrayList<Object> messageArray = new ArrayList<>();
 		messageArray.add(messageType);
-		messageArray.add(game);
-		messageArray.add(this.savedGameID);
-    	try {
+		messageArray.add(this.username);
+		
+		try {
 			toServer.writeObject(messageArray);
 			toServer.flush();
-
-	        Object object = null;
-			object = fromServer.readObject();
-			ArrayList<Object> retArr = (ArrayList<Object>)object;
 			
-			int gameInt = (int)retArr.get(0);
-			String gameString = (String)retArr.get(1);
-			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
-				ta.append(gameString.toString());
-				deleteGameUI();
-			}
-			else {
-				this.savedGameID = gameInt;
-				ta.append(gameString.toString());
-				ta.append("Game ID: " + this.savedGameID + "\n");
-			}
-
+	        Object object = null;
+			
+			object = fromServer.readObject();
+			
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			int numWins = (int)retArr.get(0);
+			int numLosses = (int)retArr.get(1);
+			
+			createWinsLossesUI(numWins, numLosses);	
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-    	//frameSaveGame.dispose();
-    	//saveGameUI();
-
 	}
+	
+	
 	
 	public Board loadGame() {
 		String messageType = "load";
@@ -519,33 +401,7 @@ public void saveGame(Board game) {
     	return loadedGame;
 	}
 	
-	public void deleteGame(Board game) {
-		String messageType = "delete";
-		ArrayList<Object> messageArray = new ArrayList<>();
-		messageArray.add(messageType);
-		messageArray.add(game);
-		
-    	try {
-			toServer.writeObject(messageArray);
-			toServer.flush();
-
-	        Object object = null;
-			object = fromServer.readObject();
-			ArrayList<Object> retArr = (ArrayList<Object>)object;
-			
-			int gameInt = (int)retArr.get(0);
-			String gameString = (String)retArr.get(1);
-			
-			this.savedGameID = gameInt;
-			ta.append(gameString.toString());
-			
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+	
 	
 	public static int[][] flip(int grid[][]){
 		for(int x=0;x<10;x++) {

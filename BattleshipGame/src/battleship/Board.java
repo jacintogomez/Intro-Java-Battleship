@@ -48,7 +48,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	
 	private JButton fire, btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
 	private JLabel deleteGameLabel;
-	private JFrame frameDeleteGame, frameEndGame;
+	private JFrame frameDeleteGame, frameEndGame, frameWinsLosses;
 	private JTextField enter;
 	private String choice;
 	private JTextArea messages, winner;
@@ -357,6 +357,10 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		btnExitGame.addActionListener(this);
 		savePanel.add(btnExitGame);
 		savePanel.add(btnSaveGame);
+		JPanel viewRecordPanel = new JPanel();
+		JButton btnViewRecords = new JButton("View Win/Loss Record");
+		btnViewRecords.addActionListener(this);
+		viewRecordPanel.add(btnViewRecords);
 		
 		
 		//rightboard.add(enter,BorderLayout.NORTH);
@@ -383,6 +387,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		enterPanel.add(enter);
 		enterPanel.add(fire);
 		topPanel.add(enterPanel,BorderLayout.EAST);
+		topPanel.add(viewRecordPanel, BorderLayout.CENTER);
 		topPanel.add(savePanel, BorderLayout.WEST);
 		topPanel.add(winner,BorderLayout.NORTH);
 		this.add(topPanel, BorderLayout.NORTH);
@@ -873,6 +878,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			}
 			this.dispose();
 		}
+		else if(cmd.equals("View Win/Loss Record")) {
+			getNumWinsLosses();
+		}
+		else if(cmd.equals("Close")) {
+			frameWinsLosses.dispose();
+		}
 	}
 	
 	public void checkifgameover() {
@@ -1150,6 +1161,71 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void getNumWinsLosses() {
+		String messageType = "WinsandLosses";
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		messageArray.add(this.username);
+		
+		try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
+			
+	        Object object = null;
+			
+			object = fromServer.readObject();
+			
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			int numWins = (int)retArr.get(0);
+			int numLosses = (int)retArr.get(1);
+			
+			createWinsLossesUI(numWins, numLosses);	
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void createWinsLossesUI(int numWins, int numLosses) {
+		frameWinsLosses = new JFrame();
+		frameWinsLosses.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameWinsLosses.setSize(400,200);
+		frameWinsLosses.setLayout(new BorderLayout());
+		String forTitleLabel = username + "'s Win/Loss Record";
+		JLabel titleLabel = new JLabel(forTitleLabel, SwingConstants.CENTER);
+		JPanel topPanel = new JPanel();
+		topPanel.add(titleLabel);
+		
+		JPanel midPanel = new JPanel(new GridLayout(3,2));
+		JLabel numWinsLabel = new JLabel("Number of wins: ");
+		JLabel numLossesLabel = new JLabel("Number of losses: ");
+		JLabel numgamesLabel = new JLabel("Total games completed: ");
+		JLabel numWinsLabelVal = new JLabel(String.valueOf(numWins), SwingConstants.CENTER);
+		JLabel numLossesLabelVal = new JLabel(String.valueOf(numLosses), SwingConstants.CENTER);
+		JLabel numgamesLabelVal = new JLabel(String.valueOf(numWins + numLosses), SwingConstants.CENTER);
+		
+		midPanel.add(numWinsLabel);
+		midPanel.add(numWinsLabelVal);
+		midPanel.add(numLossesLabel);
+		midPanel.add(numLossesLabelVal);
+		midPanel.add(numgamesLabel);
+		midPanel.add(numgamesLabelVal);
+		
+		JPanel bottomPanel = new JPanel();
+		JButton closeButton = new JButton("Close");
+		closeButton.addActionListener(this);
+		bottomPanel.add(closeButton);
+		
+		frameWinsLosses.add(topPanel, BorderLayout.NORTH);
+		frameWinsLosses.add(midPanel, BorderLayout.CENTER);
+		frameWinsLosses.add(bottomPanel, BorderLayout.SOUTH);
+		
+		frameWinsLosses.setVisible(true);
 	}
 	
 	
