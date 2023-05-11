@@ -470,7 +470,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			do {
 				x=pickspot(10);
 				y=pickspot(10);
-			}while(mygrid[x][y]!=1&&mygrid[x][y]!=2);
+			}while(alreadyhitorsurrounded(x,y));
 		}
 		computerguess+=convert(y)+Integer.toString(x+1);
 		if(mygrid[x][y]==1) {
@@ -481,8 +481,10 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			hitormiss="Hit";
 			mygrid[x][y]=4;
 			myhitsleft--;
-			for(int z=1;z<=4;z++) {
-				addsuspiciouslocations(x,y,z);
+			List<Integer> order=Arrays.asList(1,2,3,4);
+			Collections.shuffle(order);
+			for(int z=0;z<4;z++) {
+				addsuspiciouslocations(x,y,order.get(z));
 			}
 			for(Ship s:myships) {
 				s.checkifstruck(new Coordinate(x,y));
@@ -491,7 +493,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				if(s.active&&(s.holes==s.struck)) {
 					s.active=false;
 					aftermessage="Computer sunk "+this.username+"'s "+s.name+'\n';
-					attack.clear();
+					//attack.clear();
 				}
 			}
 			checkifgameover();
@@ -504,10 +506,20 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public void addsuspiciouslocations(int x,int y,int c) {
-		if(c==1&&isvalid(x,y-1)&&mygrid[x][y-1]!=3&&mygrid[x][y-1]!=4) {attack.add(new Coordinate(x,y-1));};
-		if(c==2&&isvalid(x,y+1)&&mygrid[x][y+1]!=3&&mygrid[x][y+1]!=4) {attack.add(new Coordinate(x,y+1));};
-		if(c==3&&isvalid(x+1,y)&&mygrid[x+1][y]!=3&&mygrid[x+1][y]!=4) {attack.add(new Coordinate(x+1,y));};
-		if(c==4&&isvalid(x-1,y)&&mygrid[x-1][y]!=3&&mygrid[x-1][y]!=4) {attack.add(new Coordinate(x-1,y));};
+		try{
+			if(c==1&&isvalid(x,y-1)&&mygrid[x][y-1]!=3&&mygrid[x][y-1]!=4) {attack.add(new Coordinate(x,y-1));};
+			if(c==2&&isvalid(x,y+1)&&mygrid[x][y+1]!=3&&mygrid[x][y+1]!=4) {attack.add(new Coordinate(x,y+1));};
+			if(c==3&&isvalid(x+1,y)&&mygrid[x+1][y]!=3&&mygrid[x+1][y]!=4) {attack.add(new Coordinate(x+1,y));};
+			if(c==4&&isvalid(x-1,y)&&mygrid[x-1][y]!=3&&mygrid[x-1][y]!=4) {attack.add(new Coordinate(x-1,y));};
+		}catch(Exception e) {
+			System.out.println("Index was out of bounds");
+		}
+	}
+
+	public boolean alreadyhitorsurrounded(int x,int y) {
+		if (mygrid[x][y] == 3 || mygrid[x][y] == 4) {System.out.println("already hit");return true;}
+		if (mygrid[x][y - 1] == 3 && mygrid[x][y + 1] == 3 && mygrid[x - 1][y] == 3 && mygrid[x + 1][y] == 3) {System.out.println("surrounded");return true;}
+		return false;
 	}
 		
 	public void createships() {
