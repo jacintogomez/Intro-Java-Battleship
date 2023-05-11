@@ -461,7 +461,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				y=pickspot(10);
 			}while(mygrid[x][y]!=1&&mygrid[x][y]!=2);
 		}
-		computerguess+=convert(x)+y;
+		computerguess+=convert(y)+Integer.toString(x+1);
 		if(mygrid[x][y]==1) {
 			hitormiss="Miss";
 			mygrid[x][y]=3;
