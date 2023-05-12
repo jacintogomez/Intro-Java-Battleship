@@ -163,7 +163,7 @@ public class Server extends JFrame implements Runnable {
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
 								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack, tempShipsset);
 						String gameStatus = checkGame(gameToSave);
-						System.out.println("Save Flag: " + saveFlag + " tempLoad: " + tempLoad + "\n");
+						//System.out.println("Save Flag: " + saveFlag + " tempLoad: " + tempLoad + "\n");
 						if(gameStatus.equals("Game exists")) {
 							if(saveFlag == true || (saveFlag == false && tempLoad == true)) {
 								ArrayList<Object> retArrList = new ArrayList<>();
