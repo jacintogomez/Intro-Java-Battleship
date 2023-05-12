@@ -51,8 +51,8 @@ public class Player implements ActionListener {
 	public Player(){
 		nextId++;
 		this.Id = nextId;
-		connectionUI();
-		/*
+		//connectionUI();
+		
 		try {
 			socket = new Socket("localhost", 8000);
 			userLoginUI();
@@ -70,7 +70,7 @@ public class Player implements ActionListener {
 			//e1.printStackTrace();
 			//messages.append("connection Failure\n");
 		}
-		*/
+		
 		
 	}
 	public Player(String username,String password,int id) {
@@ -179,7 +179,7 @@ public class Player implements ActionListener {
 		frameConnection = new JFrame("Connection Panel");
 		frameConnection.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		ta = new JTextArea(30,30);
-		ta.setWrapStyleWord(true);
+		//ta.setWrapStyleWord(true);
 		frameConnection.setLayout(new BorderLayout());
 	
 		JPanel topPanel = new JPanel(new GridLayout(2,1));
@@ -260,13 +260,13 @@ public class Player implements ActionListener {
 					      
 				    }
 				    catch (IOException ex) {
-				      ta.append(ex.toString() + '\n');
+				      //ta.append(ex.toString() + '\n');
 				    }
-				ta.append("connected\n");
+				//ta.append("connected\n");
 				userLoginUI();
 			} catch (IOException e1) {
 				e1.printStackTrace();
-				ta.append("connection Failure\n");
+				//ta.append("connection Failure\n");
 			}
 		}
 		else if(cmd.equals("Close Connection")) {
@@ -281,7 +281,7 @@ public class Player implements ActionListener {
 					fromServer.close();
 				}
 
-				ta.append("connection closed\n");
+				//ta.append("connection closed\n");
 			} catch (Exception e1) {
 				System.err.println("error"); 
 			}
@@ -359,7 +359,7 @@ public class Player implements ActionListener {
 	        if(messageForPlayer.equals("Welcome back!") || messageForPlayer.equals("Username and password saved!")) {
 	        	this.username = username;
 	        	this.password = password;
-	        	ta.append(messageForPlayer + "\n");
+	        	//ta.append(messageForPlayer + "\n");
 	        	//frameUserType.dispose();
 	        	frameEnterInfo.dispose();
 	        	newOrLoadGameUI();
@@ -437,7 +437,7 @@ public class Player implements ActionListener {
 			}
 			else {
 				loadedGame = (Board)retArr.get(1);
-				ta.append(gameString.toString());	
+				//ta.append(gameString.toString());	
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
