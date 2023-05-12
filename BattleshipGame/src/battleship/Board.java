@@ -1048,7 +1048,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		    newGame.setResizable(true);
 		}
 		else if(cmd.equals("Load Existing Game")) {
-			frameNewLoad.dispose();
 			Board loadedGame = loadGame();
 			if(loadedGame != null) {
 				frameNewLoad.dispose();
@@ -1242,6 +1241,48 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
     	
     	return loadedGame;
 	}
+	
+	public void deleteGame() {
+		String messageType = null;
+		if(computerWon == true || playerWon == true) {
+			messageType = "delete";
+		}
+		else {
+			messageType = "deleteandsave";
+		}
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		messageArray.add(this.username);
+		messageArray.add(this.password);
+		messageArray.add(this.mygrid);
+		messageArray.add(this.opgrid);
+		messageArray.add(this.myships);
+		messageArray.add(this.opships);
+		messageArray.add(this.myhitsleft);
+		messageArray.add(this.ophitsleft);
+		messageArray.add(this.attack);
+
+    	try {
+    		if(messageType.equals("delete")) {
+    			toServer.reset();
+    		}
+			toServer.writeObject(messageArray);
+			toServer.flush();
+
+	        Object object = null;
+			object = fromServer.readObject();
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+
+			String gameString = (String)retArr.get(0);
+			messages.insert(gameString.toString() + "\n",0);
+
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void updateWinLoss() {
 		String messageType = "updateWinLoss";
@@ -1332,47 +1373,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		frameDeleteGame.setVisible(true);
 	}
 
-	public void deleteGame() {
-		String messageType = null;
-		if(computerWon == true || playerWon == true) {
-			messageType = "delete";
-		}
-		else {
-			messageType = "deleteandsave";
-		}
-		ArrayList<Object> messageArray = new ArrayList<>();
-		messageArray.add(messageType);
-		messageArray.add(this.username);
-		messageArray.add(this.password);
-		messageArray.add(this.mygrid);
-		messageArray.add(this.opgrid);
-		messageArray.add(this.myships);
-		messageArray.add(this.opships);
-		messageArray.add(this.myhitsleft);
-		messageArray.add(this.ophitsleft);
-		messageArray.add(this.attack);
-
-    	try {
-    		if(messageType.equals("delete")) {
-    			toServer.reset();
-    		}
-			toServer.writeObject(messageArray);
-			toServer.flush();
-
-	        Object object = null;
-			object = fromServer.readObject();
-			ArrayList<Object> retArr = (ArrayList<Object>)object;
-
-			String gameString = (String)retArr.get(0);
-			messages.insert(gameString.toString() + "\n",0);
-
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+	
 
 	public void getNumWinsLosses() {
 		String messageType = "WinsandLosses";
