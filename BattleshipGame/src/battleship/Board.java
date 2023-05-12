@@ -10,7 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
-import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -60,9 +59,10 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	private boolean gameinprogress,shipsset=false, playerWon = false, computerWon = false, loadedGame = false;
 	private Queue<Coordinate> attack;
 
-	private JButton btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame;
-	private JLabel deleteGameLabel,warning,enterlabel;
-	private JFrame frameDeleteGame, frameEndGame, frameWinsLosses;
+	private JButton btnOpenConnection, btnCloseConnection, btnSaveGame, btnDeleteGame, btnContinueGame, btnNewGame, btnLoadGame, 
+		btnWinLossRecord;
+	private JLabel deleteGameLabel,warning,enterlabel, newLoadGameLabel, noLoadedGameLabel;
+	private JFrame frameDeleteGame, frameEndGame, frameWinsLosses, frameNewLoad;
 	private JTextField enter;
 	private String choice,lastchoice;
 	private JTextArea messages, winner;
@@ -1008,6 +1008,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			frameDeleteGame.dispose();
 		}
 		else if(cmd.equals("Exit game")) {
+			/*
 			try {
 				if(socket != null) {
 					socket.close();
@@ -1022,10 +1023,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			} catch (Exception e1) {
 				System.err.println("error");
 			}
+			*/
 			if(playerWon == true || computerWon == true) {
 				frameEndGame.dispose();
 			}
 			this.dispose();
+			newOrLoadGameUI();
 			//System.exit(0);
 		}
 		else if(cmd.equals("View Win/Loss Record")) {
@@ -1034,14 +1037,38 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		else if(cmd.equals("Close")) {
 			frameWinsLosses.dispose();
 		}
-		else if(cmd.equals("Start new game")) {
-			frameEndGame.dispose();
-			this.dispose();
+		else if(cmd.equals("Start New Game")) {
+			//frameEndGame.dispose();
+			//this.dispose();
+			frameNewLoad.dispose();
 			Board newGame = new Board(this.username, this.password);
 			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			newGame.setLocationRelativeTo(null);
 		    newGame.setVisible(true);
 		    newGame.setResizable(true);
+		}
+		else if(cmd.equals("Load Existing Game")) {
+			frameNewLoad.dispose();
+			Board loadedGame = loadGame();
+			if(loadedGame != null) {
+				frameNewLoad.dispose();
+				String tempUsername = loadedGame.getUsername();
+				String tempPassword = loadedGame.getPassword();
+				int[][] tempMygrid = loadedGame.getMyGrid();
+				int[][] tempOpgrid = loadedGame.getOpGrid();
+				ArrayList<Ship> tempMyships = loadedGame.getMyships();
+				ArrayList<Ship> tempOpships = loadedGame.getOpships();
+				int tempMyhitsleft = loadedGame.getMyhitsleft();
+				int tempOphitsleft = loadedGame.getOphitsleft();
+				Queue<Coordinate> tempAttack = loadedGame.getAttack();
+				Board newGame = new Board(tempUsername,tempPassword,tempMygrid,tempOpgrid,tempMyships,
+						tempOpships,tempMyhitsleft,tempOphitsleft, true, tempAttack);
+				newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				newGame.setLocationRelativeTo(null);
+			    newGame.setVisible(true);    
+			    newGame.setResizable(true);
+				//saveGameUI();
+			}
 		}
 	}
 
@@ -1179,6 +1206,42 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			e.printStackTrace();
 		}
 	}
+	
+	public Board loadGame() {
+		String messageType = "load";
+		ArrayList<Object> messageArray = new ArrayList<>();
+		messageArray.add(messageType);
+		String[] unamePword = new String[2];
+		unamePword[0] = this.username;
+		unamePword[1] = this.password;
+		messageArray.add(unamePword);
+		Board loadedGame = null;
+	
+    	try {
+			toServer.writeObject(messageArray);
+			toServer.flush();
+			
+			String tempStr = "You do not have a game saved. Please start a new game!";
+	        Object object = null;
+			
+			object = fromServer.readObject();
+			ArrayList<Object> retArr = (ArrayList<Object>)object;
+			String gameString = (String)retArr.get(0);
+			if(gameString.equals("You do not have a game saved.\nPlease start a new game!")) {
+				noLoadedGameLabel.setText(tempStr);
+			}
+			else {
+				loadedGame = (Board)retArr.get(1);
+				//ta.append(gameString.toString());	
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+    	
+    	return loadedGame;
+	}
 
 	public void updateWinLoss() {
 		String messageType = "updateWinLoss";
@@ -1223,8 +1286,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		JButton btnStartGame = new JButton("Start new game");
 		btnStartGame.addActionListener(this);
 		btnExitGame.addActionListener(this);
-		JPanel bottomPanel = new JPanel(new GridLayout(1,2));
-		bottomPanel.add(btnStartGame);
+		JPanel bottomPanel = new JPanel(new GridLayout(1,1));
+		//bottomPanel.add(btnStartGame);
 		bottomPanel.add(btnExitGame);
 
 		frameEndGame.add(topPanel, BorderLayout.NORTH);
@@ -1374,6 +1437,45 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		frameWinsLosses.add(bottomPanel, BorderLayout.SOUTH);
 		frameWinsLosses.setLocationRelativeTo(null);
 		frameWinsLosses.setVisible(true);
+	}
+	
+	private void newOrLoadGameUI()
+	{
+		frameNewLoad = new JFrame();
+		frameNewLoad.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frameNewLoad.setSize(600,125);
+		//Layout of Main Window
+		frameNewLoad.setLayout(new BorderLayout());
+		
+		newLoadGameLabel = new JLabel("Start a New Game, Load an Existing Game, or View Your Win/Loss Record");
+		JPanel pnlLabel = new JPanel();
+		pnlLabel.add(newLoadGameLabel);
+		btnNewGame = new JButton("Start New Game");
+		btnNewGame.addActionListener(this);
+		
+		btnLoadGame = new JButton("Load Existing Game");
+		btnLoadGame.addActionListener(this);
+		
+		btnWinLossRecord = new JButton("View Win/Loss Record");
+		btnWinLossRecord.addActionListener(this);
+		JPanel pnlButton = new JPanel(new GridLayout(1,3));
+		
+		pnlButton.add(btnNewGame);
+		pnlButton.add(btnLoadGame);
+		pnlButton.add(btnWinLossRecord);
+		
+		JPanel pnlBottom = new JPanel();
+		noLoadedGameLabel = new JLabel(" ");
+		noLoadedGameLabel.setForeground(Color.RED);
+		pnlBottom.add(noLoadedGameLabel);
+		
+		frameNewLoad.add(pnlLabel, BorderLayout.NORTH);
+		frameNewLoad.add(pnlButton, BorderLayout.CENTER);
+		frameNewLoad.add(pnlBottom, BorderLayout.SOUTH);
+		
+		//frame.pack();
+		frameNewLoad.setLocationRelativeTo(null);
+		frameNewLoad.setVisible(true);
 	}
 
 
