@@ -224,13 +224,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public void run() {
-		//setenterlabel("Pick locations to set your ships:");
+		setenterlabel("Set your Carrier - 5 holes (ship 1/5)");
 		while(gameinprogress) {
 			while(choice==null) {
 				timedelay(0.25);
 			}
 			if(shipsset) {
-				setenterlabel("Enter coordinates to attack:");
 				myturn();
 				leftboard.repaint();
 				rightboard.repaint();
@@ -254,6 +253,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 					lastchoice=choice;
 				}
 				shipsset=true;
+				setenterlabel("Enter coordinates to attack:");
 			}
 			choice=null;
 	    }
