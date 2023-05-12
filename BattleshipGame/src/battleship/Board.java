@@ -457,7 +457,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		int x=-1,y=-1,counter=0;
 		do {
 			try {
-				if(counter==1) {
+				if(counter>=1) {
 					if (isvalid(x, y)) {
 						setwarning(choice+" is already guessed! Please guess again");
 						System.out.println("that coordinate is already guessed; guess again");
