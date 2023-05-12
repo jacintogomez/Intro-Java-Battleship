@@ -8,6 +8,7 @@ public class Ship implements Serializable {
 	protected int holes;
 	protected int struck;
 	protected boolean active;
+	protected boolean set;
 	protected ArrayList<Coordinate> coords;
 	
 	public Ship(String name,int holes) {
@@ -19,6 +20,7 @@ public class Ship implements Serializable {
 		this.holes=holes;
 		this.struck=struck;
 		this.active=active;
+		this.set=false;
 		this.coords=new ArrayList<Coordinate>();
 	}
 	
