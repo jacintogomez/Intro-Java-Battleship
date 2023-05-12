@@ -719,22 +719,26 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 
 	public void setusership(Ship s) {
 		int counter=0;
-		int col;
-		int row;
-		String dir;
-		int len;
+		int col=-1,row=-1,len=10;
+		String dir="uninit";
 		do {
-			if(counter==1) {
-				setwarning("Invalid/overlapping position! Please pick again");
+			try {
+				if (counter == 1) {
+					setwarning("Invalid/overlapping position! Please pick again");
+				}
+				String[] params = choice.split(" ");
+				System.out.println(params[0] + " and " + params[1] + " and " + choice);
+				row = reverse(params[0].charAt(0));
+				col = Integer.parseInt(params[0].substring(1)) - 1;
+				dir = approval(params[1]);
+				len = s.holes;
+				counter++;
+				System.out.println(counter);
+			}catch(Exception e) {
+				System.out.println("error: invalid formatting");
+				setwarning("Invalid entry! Enter coordinate, space, direction. Example: J6 U");
+				dir="up";
 			}
-			String[] params=choice.split(" ");
-			System.out.println(params[0]+" and "+params[1]+" and "+choice);
-			row=reverse(params[0].charAt(0));
-			col=Integer.parseInt(params[0].substring(1))-1;
-			dir=approval(params[1]);
-			len=s.holes;
-			counter++;
-			System.out.println(counter);
 		}while(conflicts(col,row,dir,len,true));
 		setwarning("");
 		if(dir=="up") {
