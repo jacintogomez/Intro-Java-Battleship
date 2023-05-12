@@ -709,6 +709,14 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 //		}
 	}
 
+	public String approval(String d){
+		if(d.equals("u")||d.equals("U")){return "up";}
+		if(d.equals("d")||d.equals("D")){return "down";}
+		if(d.equals("l")||d.equals("L")){return "left";}
+		if(d.equals("r")||d.equals("R")){return "right";}
+		return "error";
+	}
+
 	public void setusership(Ship s) {
 		int counter=0;
 		int col;
@@ -719,10 +727,11 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			if(counter==1) {
 				setwarning("Invalid/overlapping position! Please pick again");
 			}
-			row=reverse(choice.charAt(0));
-			col=Integer.parseInt(choice.substring(1))-1;
-			System.out.println(row+" and "+col+" and "+choice);
-			dir="down";
+			String[] params=choice.split(" ");
+			System.out.println(params[0]+" and "+params[1]+" and "+choice);
+			row=reverse(params[0].charAt(0));
+			col=Integer.parseInt(params[0].substring(1))-1;
+			dir=approval(params[1]);
 			len=s.holes;
 			counter++;
 			System.out.println(counter);
