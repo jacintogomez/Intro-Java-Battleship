@@ -66,8 +66,8 @@ public class Player implements ActionListener {
 			    }
 			//messages.append("connected\n");
 		} catch (IOException e1) {
-			System.out.println("Run Server.java as application first!");
-			//e1.printStackTrace();
+			//System.out.println("Run Server.java as application first!");
+			e1.printStackTrace();
 			//messages.append("connection Failure\n");
 		}
 		
