@@ -752,6 +752,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				System.out.println("error: invalid formatting");
 				setwarning("Invalid entry! Enter coordinate, space, direction. Example: J6 U");
 				dir="up";
+				col=row=-1;
 			}
 		}while(conflicts(col,row,dir,len,true)||dir.equals("error"));
 		setwarning("");
