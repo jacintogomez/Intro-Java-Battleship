@@ -52,6 +52,25 @@ public class Player implements ActionListener {
 		nextId++;
 		this.Id = nextId;
 		connectionUI();
+		/*
+		try {
+			socket = new Socket("localhost", 8000);
+			userLoginUI();
+			try {
+		    	  toServer = new ObjectOutputStream(socket.getOutputStream());
+			      fromServer = new ObjectInputStream(socket.getInputStream());
+
+			    }
+			    catch (IOException ex) {
+			      //messages.append(ex.toString() + '\n');
+			    }
+			//messages.append("connected\n");
+		} catch (IOException e1) {
+			System.out.println("Run Server.java as application first!");
+			//e1.printStackTrace();
+			//messages.append("connection Failure\n");
+		}
+		*/
 		
 	}
 	public Player(String username,String password,int id) {
@@ -414,7 +433,6 @@ public class Player implements ActionListener {
 			ArrayList<Object> retArr = (ArrayList<Object>)object;
 			String gameString = (String)retArr.get(0);
 			if(gameString.equals("You do not have a game saved.\nPlease start a new game!")) {
-				//ta.append(tempStr + "\n");
 				noLoadedGameLabel.setText(tempStr);
 			}
 			else {
