@@ -737,6 +737,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				if (counter == 1) {
 					setwarning("Invalid/overlapping position! Please pick again");
 				}
+				if(dir.equals("error")) {
+					setwarning("Invalid ship direction! Must be U, D, L or R");
+				}
 				String[] params = choice.split(" ");
 				System.out.println(params[0] + " and " + params[1] + " and " + choice);
 				row = reverse(params[0].charAt(0));
@@ -750,7 +753,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				setwarning("Invalid entry! Enter coordinate, space, direction. Example: J6 U");
 				dir="up";
 			}
-		}while(conflicts(col,row,dir,len,true));
+		}while(conflicts(col,row,dir,len,true)||dir.equals("error"));
 		setwarning("");
 		if(dir=="up") {
 			while(len>0&&row>=0) {
