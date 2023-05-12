@@ -224,7 +224,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public void run() {
-		setenterlabel("Set your Carrier - 5 holes (ship 1/5)");
+		setenterlabel("Set your Carrier - 5 spaces (ship 1/5)");
 		while(gameinprogress) {
 			while(choice==null) {
 				timedelay(0.25);
