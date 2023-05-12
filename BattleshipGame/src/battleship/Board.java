@@ -29,7 +29,20 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	    Color.WHITE,  // miss
 	    Color.RED     // hit
 	};
-	private static final String[] directions= {"up","down","left","right"};
+	private static final String[] directions= {
+		"up",
+		"down",
+		"left",
+		"right"
+	};
+
+	private static final String[] prompts= {
+		"First, set your Carrier",
+		"Now set your Battleship",
+		"Now set your Destroyer",
+		"Now set your Submarine",
+		"Lastly, set your Patrol Boat"
+	};
 
 	//1=open, 2=ship, 3=miss, 4=hit
 	private static final long serialVersionUID = 1L;
@@ -211,7 +224,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public void run() {
-		setenterlabel("Pick locations to set your ships");
+		//setenterlabel("Pick locations to set your ships:");
 		while(gameinprogress) {
 			while(choice==null) {
 				timedelay(0.25);
@@ -227,7 +240,11 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 					rightboard.repaint();
 				}
 			}else {
+				int q=1;
 				for(Ship s:myships) {
+					//setenterlabel("Ship "+q+"/5 - Set your "+s.name+" ("+s.holes+" spaces)");
+					setenterlabel("Set your "+s.name+" - "+s.holes+" spaces (ship "+q+"/5)");
+					q++;
 					while(choice==null||choice==lastchoice) {
 						timedelay(0.25);
 					}
