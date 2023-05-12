@@ -310,8 +310,9 @@ public class Player implements ActionListener {
 				int tempMyhitsleft = loadedGame.getMyhitsleft();
 				int tempOphitsleft = loadedGame.getOphitsleft();
 				Queue<Coordinate> tempAttack = loadedGame.getAttack();
+				boolean tempShipsset = loadedGame.getShipsset();
 				newGame = new Board(tempUsername,tempPassword,tempMygrid,tempOpgrid,tempMyships,
-						tempOpships,tempMyhitsleft,tempOphitsleft, true, tempAttack);
+						tempOpships,tempMyhitsleft,tempOphitsleft, true, tempAttack, tempShipsset);
 				newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				newGame.setLocationRelativeTo(null);
 			    newGame.setVisible(true);    

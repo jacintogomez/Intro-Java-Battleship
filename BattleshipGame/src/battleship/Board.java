@@ -131,7 +131,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public Board(String username,String password,int mygrid[][],int opgrid[][],ArrayList<Ship> myships,
-			ArrayList<Ship> opships,int myhitsleft,int ophitsleft,boolean launchGame, Queue<Coordinate> attack) {
+			ArrayList<Ship> opships,int myhitsleft,int ophitsleft,boolean launchGame, Queue<Coordinate> attack,
+			boolean shipsset) {
+		this.shipsset= shipsset;
 		this.loadedGame = true;
 		this.username=username;
 		this.password=password;
@@ -190,6 +192,10 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public int getOphitsleft() {
 		return this.ophitsleft;
 	}
+	
+	public boolean getShipsset() {
+		return this.shipsset;
+	}
 
 	public String getUsername() {
 		return this.username;
@@ -224,7 +230,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public void run() {
-		setenterlabel("Set your Carrier - 5 spaces (ship 1/5)");
+		if(shipsset == false) {
+			setenterlabel("Set your Carrier - 5 spaces (ship 1/5)");
+		}
+		else {
+			setenterlabel("Enter coordinates to attack:");
+		}
 		while(gameinprogress) {
 			while(choice==null) {
 				timedelay(0.25);
@@ -1060,8 +1071,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				int tempMyhitsleft = loadedGame.getMyhitsleft();
 				int tempOphitsleft = loadedGame.getOphitsleft();
 				Queue<Coordinate> tempAttack = loadedGame.getAttack();
+				boolean tempShipsset = loadedGame.getShipsset();
 				Board newGame = new Board(tempUsername,tempPassword,tempMygrid,tempOpgrid,tempMyships,
-						tempOpships,tempMyhitsleft,tempOphitsleft, true, tempAttack);
+						tempOpships,tempMyhitsleft,tempOphitsleft, true, tempAttack, tempShipsset);
 				newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				newGame.setLocationRelativeTo(null);
 			    newGame.setVisible(true);    
@@ -1128,49 +1140,54 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	}
 
 	public void saveGame() {
-		String messageType = "save";
-		//this.setGridCell(5, 5, setNum);
-		//setNum++;
-		//this.printGrid();
-		System.out.println("save");
-		ArrayList<Object> messageArray = new ArrayList<>();
-		messageArray.add(messageType);
-		messageArray.add(this.loadedGame);
-		messageArray.add(this.username);
-		messageArray.add(this.password);
-		messageArray.add(this.mygrid);
-		messageArray.add(this.opgrid);
-		messageArray.add(this.myships);
-		messageArray.add(this.opships);
-		messageArray.add(this.myhitsleft);
-		messageArray.add(this.ophitsleft);
-		messageArray.add(this.attack);
-    	try {
-			toServer.writeObject(messageArray);
-			toServer.flush();
-
-	        Object object = null;
-			object = fromServer.readObject();
-			ArrayList<Object> retArr = (ArrayList<Object>)object;
-
-			String gameString = (String)retArr.get(0);
-			if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
-				deleteGameUI();
-			}
-			else if(gameString.equals("An earlier version of this game is saved. Updating game to current state.")) {
-				messages.insert(gameString.toString() + "\n",0);
-				updateGame();
-			}
-			else {
-				messages.insert(gameString.toString() + "\n",0);
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+		if(shipsset == false) {
+			messages.insert("You cannot save this game until you have added all 5 ships to your board!\n",0);
 		}
-
+		else {
+			String messageType = "save";
+			//this.setGridCell(5, 5, setNum);
+			//setNum++;
+			//this.printGrid();
+			System.out.println("save");
+			ArrayList<Object> messageArray = new ArrayList<>();
+			messageArray.add(messageType);
+			messageArray.add(this.loadedGame);
+			messageArray.add(this.username);
+			messageArray.add(this.password);
+			messageArray.add(this.mygrid);
+			messageArray.add(this.opgrid);
+			messageArray.add(this.myships);
+			messageArray.add(this.opships);
+			messageArray.add(this.myhitsleft);
+			messageArray.add(this.ophitsleft);
+			messageArray.add(this.attack);
+			messageArray.add(this.shipsset);
+	    	try {
+				toServer.writeObject(messageArray);
+				toServer.flush();
+	
+		        Object object = null;
+				object = fromServer.readObject();
+				ArrayList<Object> retArr = (ArrayList<Object>)object;
+	
+				String gameString = (String)retArr.get(0);
+				if(gameString.equals("You have a game saved.\nYou can only have 1 game saved at a time.\nPlease either delete this game in order to save the current game, or continue playing the current game.\n")) {
+					deleteGameUI();
+				}
+				else if(gameString.equals("An earlier version of this game is saved. Updating game to current state.")) {
+					messages.insert(gameString.toString() + "\n",0);
+					updateGame();
+				}
+				else {
+					messages.insert(gameString.toString() + "\n",0);
+				}
+	
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void updateGame() {
@@ -1186,6 +1203,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		messageArray.add(this.myhitsleft);
 		messageArray.add(this.ophitsleft);
 		messageArray.add(this.attack);
+		messageArray.add(this.shipsset);
 
 		try {
 			toServer.reset();
@@ -1261,7 +1279,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		messageArray.add(this.myhitsleft);
 		messageArray.add(this.ophitsleft);
 		messageArray.add(this.attack);
-
+		messageArray.add(this.shipsset);
     	try {
     		if(messageType.equals("delete")) {
     			toServer.reset();

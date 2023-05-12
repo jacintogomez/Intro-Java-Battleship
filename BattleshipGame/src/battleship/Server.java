@@ -25,7 +25,7 @@ public class Server extends JFrame implements Runnable {
 	private ServerSocket serverSocket;
 	private Socket socket;
 	private int setNum = 2;
-	private boolean saveFlag = false;
+	
 	private boolean loadFlag = false;
     
 	public Server() {
@@ -79,7 +79,7 @@ public class Server extends JFrame implements Runnable {
 	
 	class HandleAPlayer implements Runnable {
 	    private Socket socket; // A connected socket
-	    
+	    private boolean saveFlag = false;
 	    
 	    /** Construct a thread */
 	    public HandleAPlayer(Socket socket) {
@@ -159,11 +159,11 @@ public class Server extends JFrame implements Runnable {
 						int tempMyHitsLeft = (int)sentArr.get(8);
 						int tempOpHitsLeft = (int)sentArr.get(9);
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(10);
-						
+						boolean tempShipsset = (boolean)sentArr.get(11);
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
-								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
+								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack, tempShipsset);
 						String gameStatus = checkGame(gameToSave);
-						//System.out.println("Save Flag: " + saveFlag + " tempLoad: " + tempLoad + "\n");
+						System.out.println("Save Flag: " + saveFlag + " tempLoad: " + tempLoad + "\n");
 						if(gameStatus.equals("Game exists")) {
 							if(saveFlag == true || (saveFlag == false && tempLoad == true)) {
 								ArrayList<Object> retArrList = new ArrayList<>();
@@ -226,8 +226,9 @@ public class Server extends JFrame implements Runnable {
 						int tempMyHitsLeft = (int)sentArr.get(7);
 						int tempOpHitsLeft = (int)sentArr.get(8);
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
+						boolean tempShipsset = (boolean)sentArr.get(10);
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
-								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
+								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack, tempShipsset);
 						deleteGame(tempUsername, tempPassword);
 						saveGame(gameToSave);
 						saveFlag = true;
@@ -247,9 +248,9 @@ public class Server extends JFrame implements Runnable {
 						int tempMyHitsLeft = (int)sentArr.get(7);
 						int tempOpHitsLeft = (int)sentArr.get(8);
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
-						
+						boolean tempShipsset = (boolean)sentArr.get(10);
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
-								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
+								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack, tempShipsset);
 						String gameStatus = checkGame(gameToSave);
 						if(gameStatus.equals("Game exists")) {
 							deleteGame(tempUsername, tempPassword);
@@ -281,8 +282,9 @@ public class Server extends JFrame implements Runnable {
 						int tempMyHitsLeft = (int)sentArr.get(7);
 						int tempOpHitsLeft = (int)sentArr.get(8);
 						Queue<Coordinate> tempAttack = (Queue<Coordinate>)sentArr.get(9);
+						boolean tempShipsset = (boolean)sentArr.get(10);
 						Board gameToSave = new Board(tempUsername, tempPassword, tempMyGrid, tempOpGrid, tempMyship,
-								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack);
+								tempOpship, tempMyHitsLeft, tempOpHitsLeft, false, tempAttack, tempShipsset);
 						//gameToSave.printGrid();
 						//ta.append("About to update!\n");
 						updateGame(gameToSave);
