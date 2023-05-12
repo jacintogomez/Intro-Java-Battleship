@@ -1055,6 +1055,21 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		else if(cmd.equals("Start New Game")) {
 			//frameEndGame.dispose();
 			//this.dispose();
+			try { 
+				if(socket != null) {
+					socket.close();
+				}
+				if(toServer != null) {
+					toServer.close();
+				}
+				if(fromServer != null) {
+					fromServer.close();
+				}
+
+				//ta.append("connection closed\n");
+			} catch (Exception e1) {
+				System.err.println("error"); 
+			}
 			frameNewLoad.dispose();
 			Board newGame = new Board(this.username, this.password);
 			newGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -1065,6 +1080,21 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		else if(cmd.equals("Load Existing Game")) {
 			Board loadedGame = loadGame();
 			if(loadedGame != null) {
+				try { 
+					if(socket != null) {
+						socket.close();
+					}
+					if(toServer != null) {
+						toServer.close();
+					}
+					if(fromServer != null) {
+						fromServer.close();
+					}
+
+					//ta.append("connection closed\n");
+				} catch (Exception e1) {
+					System.err.println("error"); 
+				}
 				frameNewLoad.dispose();
 				String tempUsername = loadedGame.getUsername();
 				String tempPassword = loadedGame.getPassword();
@@ -1098,14 +1128,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			updateWinLoss();
 			deleteGame();
 			endGameUI();
-			System.out.println("Computer Wins!");
 		}else {
 			winner.append(username+" Wins!");
 			playerWon = true;
 			updateWinLoss();
 			deleteGame();
 			endGameUI();
-			System.out.println(username+" Wins!");
 		}
 		gameinprogress=false;
 	}
@@ -1152,7 +1180,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			//this.setGridCell(5, 5, setNum);
 			//setNum++;
 			//this.printGrid();
-			System.out.println("save");
+			//System.out.println("save");
 			ArrayList<Object> messageArray = new ArrayList<>();
 			messageArray.add(messageType);
 			messageArray.add(this.loadedGame);
