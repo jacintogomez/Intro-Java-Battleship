@@ -455,6 +455,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public void myturn() {
 		//System.out.println("my choice is "+choice);
 		int x=-1,y=-1,counter=0;
+		boolean error=false;
 		do {
 			try {
 				if(counter>=1) {
@@ -462,7 +463,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 						setwarning(choice+" is already guessed! Please guess again");
 						//System.out.println("that coordinate is already guessed; guess again");
 					}else {
-						setwarning(choice + " is not a valid coordinate! Please guess again");
+						if(!error) {
+							setwarning(choice + " is not a valid coordinate! Please guess again");
+						}
 						//System.out.println(choice + " is not a valid coordinate! Please guess again");
 					}
 				}
@@ -471,6 +474,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				counter++;
 			}catch(Exception e) {
 				setwarning("Invalid coordinate! Please guess again");
+				x=y=-1;
+				error=true;
 				//System.out.println("invalid input");
 			}
 		}while(!isvalid(x,y)||opgrid[x][y]==3||opgrid[x][y]==4);
