@@ -453,17 +453,17 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public boolean isvalid(int x,int y) {return x>=0&&y>=0&&x<=9&&y<=9;}
 
 	public void myturn() {
-		System.out.println("my choice is "+choice);
+		//System.out.println("my choice is "+choice);
 		int x=-1,y=-1,counter=0;
 		do {
 			try {
 				if(counter>=1) {
 					if (isvalid(x, y)) {
 						setwarning(choice+" is already guessed! Please guess again");
-						System.out.println("that coordinate is already guessed; guess again");
+						//System.out.println("that coordinate is already guessed; guess again");
 					}else {
 						setwarning(choice + " is not a valid coordinate! Please guess again");
-						System.out.println(choice + " is not a valid coordinate! Please guess again");
+						//System.out.println(choice + " is not a valid coordinate! Please guess again");
 					}
 				}
 				y=reverse(choice.charAt(0));
@@ -565,7 +565,8 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			if(c==3&&isvalid(x+1,y)&&mygrid[x+1][y]!=3&&mygrid[x+1][y]!=4) {attack.add(new Coordinate(x+1,y));};
 			if(c==4&&isvalid(x-1,y)&&mygrid[x-1][y]!=3&&mygrid[x-1][y]!=4) {attack.add(new Coordinate(x-1,y));};
 		}catch(Exception e) {
-			System.out.println("Index was out of bounds");
+			//System.out.println("Index was out of bounds");
+			System.out.println(" ");
 		}
 	}
 
@@ -741,15 +742,15 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 					setwarning("Invalid ship direction! Must be U, D, L or R");
 				}
 				String[] params = choice.split(" ");
-				System.out.println(params[0] + " and " + params[1] + " and " + choice);
+				//System.out.println(params[0] + " and " + params[1] + " and " + choice);
 				row = reverse(params[0].charAt(0));
 				col = Integer.parseInt(params[0].substring(1)) - 1;
 				dir = approval(params[1]);
 				len = s.holes;
 				counter++;
-				System.out.println(counter);
+				//System.out.println(counter);
 			}catch(Exception e) {
-				System.out.println("error: invalid formatting");
+				//System.out.println("error: invalid formatting");
 				setwarning("Invalid entry! Enter coordinate, space, direction. Example: J6 U");
 				dir="up";
 				col=row=-1;
@@ -816,12 +817,12 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	        	if(counter>1) {frame.setwarning("Invalid/overlapping location. Pick again!");}
 	        	while(!initialized) {
 	        		timedelay(0.5);
-		        	System.out.println("uninitialized");
+		        	//System.out.println("uninitialized");
 		        	if(frame.direction!=null&&frame.number!=-1&&frame.letter!='a') {
 		        		initialized=true;
 		        	}
 	        	}
-	        	System.out.println("initialized now");
+	        	//System.out.println("initialized now");
 	        	initialized=false;
 	        	col=frame.number;
 				row=reverse(frame.letter);
@@ -1119,7 +1120,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 
 	public void checkifgameover() {
 		if(myhitsleft>0&&ophitsleft>0) {
-			System.out.println("game continuing");
+			//System.out.println("game continuing");
 			return;
 		}
 		if(myhitsleft==0) {
@@ -1162,13 +1163,13 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	public void printGrid() {
 		for(int x=0;x<10;x++) {
 			for(int y=0;y<10;y++) {
-				System.out.print(opgrid[y][x] + "\t");
+				//System.out.print(opgrid[y][x] + "\t");
 				if(y == 9) {
 					System.out.print("\n");
 				}
 			}
 		}
-		System.out.println("\n");
+		//System.out.println("\n");
 	}
 
 	public void saveGame() {
@@ -1531,7 +1532,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 
 
 	public static void main(String[] args) {
-		Board game=new Board("Fayed","12345");
+		Board game=new Board("Jacinto","12345");
 		game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    game.setVisible(true);
 	    game.setResizable(true);
