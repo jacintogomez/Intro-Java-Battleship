@@ -109,6 +109,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		}
 		ophitsleft=myhitsleft=17;
 		createships();
+		attack=new LinkedList<Coordinate>();
 		setopponentships();
 		//setuserships();
 		//randomizeuserships();
@@ -143,7 +144,15 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 		this.opships=opships;
 		this.myhitsleft=myhitsleft;
 		this.ophitsleft=ophitsleft;
-		this.attack=attack;
+		this.attack=(LinkedList)attack;
+//		for(Coordinate s : this.attack) {
+//			  System.out.println(s.toString());
+//		}
+//		System.out.println("done with first");
+//		for(Coordinate s : attack) {
+//			  System.out.println(s.toString());
+//		}
+//		System.out.println("done with second");
 		if(launchGame == true) {
 			launchgame();
 			try {
@@ -219,7 +228,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 
 	public void launchgame() {
 		gameinprogress=true;
-		attack=new LinkedList<Coordinate>();
+		//attack=new LinkedList<Coordinate>();
 		enter=new JTextField(5);
 		enter.addActionListener(new textfieldlistener());
 		this.setBackground(Color.LIGHT_GRAY);
