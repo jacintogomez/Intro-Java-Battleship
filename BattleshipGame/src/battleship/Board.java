@@ -51,7 +51,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 	private JLabel deleteGameLabel,warning,enterlabel;
 	private JFrame frameDeleteGame, frameEndGame, frameWinsLosses;
 	private JTextField enter;
-	private String choice;
+	private String choice,lastchoice;
 	private JTextArea messages, winner;
 	private JScrollPane scroll;
 
@@ -228,9 +228,13 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				}
 			}else {
 				for(Ship s:myships) {
+					while(choice==null||choice==lastchoice) {
+						timedelay(0.25);
+					}
 					setusership(s);
 					leftboard.repaint();
 					rightboard.repaint();
+					lastchoice=choice;
 				}
 				shipsset=true;
 			}
@@ -700,7 +704,7 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 			}
 			row=reverse(choice.charAt(0));
 			col=Integer.parseInt(choice.substring(1))-1;
-			System.out.println(row+" and "+col);
+			System.out.println(row+" and "+col+" and "+choice);
 			dir="down";
 			len=s.holes;
 			counter++;
@@ -778,7 +782,6 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 				row=reverse(frame.letter);
 				dir=frame.direction;
 				len=s.getHoles();
-				System.out.println("coordinate for "+s.name+" is "+row+":"+col+" "+dir);
 	        }while(conflicts(col,row,dir,len,true));
 	        initialized=false;
 			if(dir=="up") {
