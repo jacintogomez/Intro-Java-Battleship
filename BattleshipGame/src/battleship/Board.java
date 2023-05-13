@@ -956,7 +956,9 @@ public class Board extends JFrame implements Runnable, Serializable, ActionListe
 
 	public Color getholecolor(int code,boolean thisismygrid) {
 		Color col=Color.blue;
-		if(code==2) {if(thisismygrid) {col=Color.gray;}}
+		if(code==2) {
+			if(thisismygrid||!gameinprogress) {col=Color.gray;}
+		}
 		if(code==3) {col=Color.white;}
 		if(code==4) {col=Color.red;}
 		return col;
